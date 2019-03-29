@@ -1,5 +1,3 @@
-# Posts
-
-Apr 2, 2019 by [Areg Sarkissian](https://aregcode.com/about)
+# Spring Boot dev environment setup
 
 [Spring Boot dev environment setup](https://aregcode.com/blog/2019/spring-boot-dev-environment-setup)
