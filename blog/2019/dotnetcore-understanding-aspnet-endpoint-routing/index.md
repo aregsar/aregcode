@@ -50,7 +50,51 @@ To drive this last point how I will show you the route mapping API in version 3 
 
 Its important to note that the Endpoint resolution and dispatch happen during runtime request handling after the routing middleware and route mapping is configured during application startup configuration. Therefor the route resolution middleware during request handling has access to the route mappings configured during startup.
 
-> Note: The routing pipeline endpoint resolver middleware, endpoint dispatcher middleware and route mapping configuration is configured in the `Startup.Configure` method.
+## Endpoint routing configuration
+
+The routing pipeline endpoint resolver middleware, endpoint dispatcher middleware and route mapping configuration is configured in the `Configure` method of the `Startup.cs` file of ASP.NET projects. This configuration changed between 2.2 and 3.0 preview versions and is still changing before the v3 release. 
+
+However we can declare the general form of the endpoint routing middleware configuration as pseudo code based on the core concepts listed above:
+
+```csharp
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    app.UseBeforeEndpointResolutionMiddleware()
+
+    app.UseEndpointRoutingResolverMiddleware(routes =>
+    {
+        routes.MapControllers();
+    })
+
+    app.UseAfterEndpointResolutionMiddleware()
+
+    app.UseEndpointDispatcherMiddleware();
+}
+```
+
+This version shows the roue mappings with the UseEndpointRoutingResolver middleware.
+An alternate version could be with the mappings done in the UseEndpointDispatcherMiddleware
+
+```csharp
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    app.UseBeforeEndpointResolutionMiddleware()
+
+    app.UseEndpointRoutingResolverMiddleware();
+
+    app.UseAfterEndpointResolutionMiddleware()
+
+    app.UseEndpointDispatcherMiddleware(routes =>
+    {
+        routes.MapControllers();
+    })
+}
+```
+
+Either way the UseEndpointRoutingResolverMiddleware() endpoint resolver middleware will have access to the route mappings at request processing time to do the route matching.
+Onece the route is matched by UseEndpointRoutingResolverMiddleware and Endpoint object will be constructed with the route parameters and set to the httpcontext so that the following middlewares in the pipeline can access the Endpoint object and use it if needed.
+
+In version 3 preview the route mapping passed to UseEndpointRoutingResolverMiddleware and the final UseEndpointDispatcherMiddleware is not present because the framework itself will dispacth the resolved endpoint at the end of the request pipeline. This looks like to be changing with the v3 release version as the current source code shows that the UseEndpointDispatcherMiddleware is added back in and it is the middleware that takes the route mappings as a parameter.
 
 ### Endpoint routing in V2.2 preview
 
@@ -73,8 +117,6 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 ```
 
 ### Endpoint routing in V3 preview
-
-
 
 Here is the endpoint routing configuration in version 3 preview.
 As you can see we have a `app.UseRouting(...)` method that configures the endpoint resolution middleware. The method also takes a anonymous lambda function that configures the route mappings that the endpoint resolver will use to resolve the incoming request route endpoint. The `routes.MapControllers()` inside the mapping function configures the default MVC routes.
