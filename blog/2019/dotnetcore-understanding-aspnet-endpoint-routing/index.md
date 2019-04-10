@@ -72,7 +72,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 }
 ```
 
-This version shows the roue mappings with the UseEndpointRoutingResolver middleware.
+This version of our pseudocode shows the route mappings with the UseEndpointRoutingResolver middleware.
 An alternate version could be with the mappings done in the UseEndpointDispatcherMiddleware
 
 ```csharp
@@ -100,7 +100,6 @@ In version 3 preview the route mapping passed to UseEndpointRoutingResolverMiddl
 
 If you create a webapi project using version 2.2 of the .NET Core SDK you will see the 
 following code in the `Startup.Configure` method.
-The MVC middleware is configured at the end of the middleware pipeline using the `UseMvc()` method. This method internally configures the MVC controller action dispatcher middleare and the default MVC route mapping configuratin. It also handles the route resolution based on the route map configuration and the incoming request data.
 
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -116,14 +115,40 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 }
 ```
 
+The MVC middleware is configured at the end of the middleware pipeline using the `UseMvc()` method. This method internally configures the default MVC route mapping configuration and the MVC controller action dispatcher middleware that dispatches the controller action.
+By default the out of the box template in v2.2 just configures the MVC dispatcher middleware. AS such the MVC middleware also handles the route resolution based on the route map configuration and the incoming request data. 
+
+However we can endable Endpoint Routing using some additional configuration. The modified code is shown below:
+
+```csharp
+
+using Microsoft.AspNetCore.Internal;
+
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    if (env.IsDevelopment())
+        app.UseDeveloperExceptionPage();
+    else
+        app.UseHsts();
+
+    app.UseEndpointRouting();
+
+    app.UseHttpsRedirection();
+
+    app.UseMvc();
+
+    //DefaultEndpointDataSource
+    //app.UseEndpoint();
+}
+```
+
+Here we have added the namespace Microsoft.AspNetCore.Internal which enables an additional IApplicationBuilder extension method `UseEndpointRouting` that is the endpoint resolution middleware that resolves the route and adds the Endpoint object to the httpcontext. In version 2.2 the MVC middleware at the end of the pipeline acts as the endpoint dispatcher middleware will dispatch the matched endpoint to the proper controller action. The endpoint resolution middleware uses the routes configured by the MVC middleware.
+
 ### Endpoint routing in V3 preview
 
+In v3 endpoint routing will become a full fledged citizen of ASP.NET Core and we will finally have separation between the MVC controller action dispatcher and the routing middleware.
+
 Here is the endpoint routing configuration in version 3 preview.
-As you can see we have a `app.UseRouting(...)` method that configures the endpoint resolution middleware. The method also takes a anonymous lambda function that configures the route mappings that the endpoint resolver will use to resolve the incoming request route endpoint. The `routes.MapControllers()` inside the mapping function configures the default MVC routes.
-
-You will also notice that there is a `app.UseAuthorization()` after `app.UseRouting(...)` which configures the authorization middleware. This middleware can not access the httpcontext endpoint object set by the endpoint routing middleware.
-
-Notice that we dont have any MVC middleware configuration at the end after configuring all other middleware. This is becuase the behavior of the v3.0 preview build is that the endpoint resolved by the  `app.UseRouting(...)` method will automatically be dispatched.
 
 ```csharp
 public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -148,10 +173,65 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 }
 ```
 
+As you can see we have a `app.UseRouting(...)` method that configures the endpoint resolution middleware. The method also takes a anonymous lambda function that configures the route mappings that the endpoint resolver will use to resolve the incoming request route endpoint. The `routes.MapControllers()` inside the mapping function configures the default MVC routes.
+
+You will also notice that there is a `app.UseAuthorization()` after `app.UseRouting(...)` which configures the authorization middleware. This middleware can not access the httpcontext endpoint object set by the endpoint routing middleware.
+
+Notice that we dont have any MVC middleware configuration at the end after configuring all other middleware. This is becuase the behavior of the v3.0 preview build is that the endpoint resolved by the  `app.UseRouting(...)` method will automatically be dispatched.
+
 ### Endpoint routing in ASP.NET Core source code repository for upcomming V3 release
 
 We will see next how this is changed yet again in the current source code to make it more explicit that we have a dispacther middleware at the end. Also the route mappings are moved to the dispatcher middleware configuration.
 
+Here is a sinppet form the v3.0 sample application music store at:
+
+https://github.com/aspnet/AspNetCore/blob/master/src/MusicStore/samples/MusicStore/Startup.cs
+
+```csharp
+public void Configure(IApplicationBuilder app)
+{
+    // Configure Session.
+    app.UseSession();
+
+    // Add static files to the request pipeline
+    app.UseStaticFiles();
+
+    // Add the endpoint routing matcher middleware to the request pipeline
+    app.UseRouting();
+
+    // Add cookie-based authentication to the request pipeline
+    app.UseAuthentication();
+
+    // Add the authorization middleware to the request pipeline
+    app.UseAuthorization();
+
+    // Add endpoints to the request pipeline
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllerRoute(
+            name: "areaRoute",
+            pattern: "{area:exists}/{controller}/{action}",
+            defaults: new { action = "Index" });
+
+        endpoints.MapControllerRoute(
+            name: "default",
+            pattern: "{controller}/{action}/{id?}",
+            defaults: new { controller = "Home", action = "Index" });
+
+        endpoints.MapControllerRoute(
+            name: "api",
+            pattern: "{controller}/{id?}");
+    });
+}
+```
+
+Now you can see that we have something similar to our pseudocode implementation. Particularly we still have the  app.UseRouting() from the v3 preview version, but now we also have an explicit  app.UseEndpoints(...) endpoint resolver method that is a new IApplicationBuilder extension method that provides the endpoint dispatch implementation. Also the route mappings have been moved from the UseRouting method to the new UseEndpoints method. The UseRouting endpoint resolver will still have access to the mappings defined at application startup to resolve the endpoint at request handling time.
+
+We can also see the explicit mappings inside the lambda function.
+
+You can checkout  the source for the  UseEndpoints and UseRouting methods here:
+
+https://github.com/aspnet/AspNetCore/blob/master/src/Http/Routing/src/Builder/EndpointRoutingApplicationBuilderExtensions.cs
 
 ## Adding Endpoint routing middleware to the DI container
 
