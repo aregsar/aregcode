@@ -10,7 +10,7 @@ In this post I will explain the new Endpoint Routing feature that has been added
 
 Prior to endpoint routing the routing reslotion for an ASP.NET Core application was done in the ASP.NET Core MVC middleware at the end of the HTTP request processing pipeline. This meant that route information was not available to middleware before the MVC middleware.
 
-It is particularly usefull to have this route information available for example to authorization middleware to use the information as a factor in the authorization process.
+It is particularly usefull to have this route information available for example in a CORS or authorization middleware to use the information as a factor in the authorization process.
 
 Another potential usage is to dynamically determine which pipeline middleware should apply to which routes. In fact this is done in many other web frameworks such as Laravel.
 
@@ -245,4 +245,31 @@ public void ConfigureServices(IServiceCollection services)
         }
 ```
 
-## Endpoint Mappings and Endpoint Authoriation
+## Endpoint Mappings and Endpoint Authoriation in V3 preview 3
+
+```csharp
+
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    if (env.IsDevelopment())
+        app.UseDeveloperExceptionPage();
+
+    app.UseStaticFiles();
+
+    app.UseRouting(routes =>
+    {
+        routes.MapApplication();
+
+        routes.MapGet("/hello", context =>
+        {
+            return context.Response.WriteAsync("Hi there! Here's your secret message");
+        })
+        .RequireAuthorization(new AuthorizeAttribute(){ Roles = "secret-messages", });
+
+        routes.MapHealthChecks("/healthz").RequireAuthorization("admin");
+    });
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+```
