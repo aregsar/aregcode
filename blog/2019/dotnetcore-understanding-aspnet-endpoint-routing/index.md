@@ -1,5 +1,7 @@
 # Understanding ASP.NET Core Endpoint Routing
 
+April 11, 2019 by [Areg Sarkissian](https://aregcode.com/about)
+
 [Understanding .NET Core Endpoint Routing](https://aregcode.com/blog/2019/dotnetcore-understanding-aspnet-endpoint-routing)
 
 ## Introduction

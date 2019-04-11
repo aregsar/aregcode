@@ -1,5 +1,7 @@
 # Understanding .NET Core SDK, Runtime and CLI versioning
 
+April 11, 2019 by [Areg Sarkissian](https://aregcode.com/about)
+
 [Understanding .NET Core SDK, Runtime and CLI versioning](https://aregcode.com/blog/2019/dotnetcore-understanding-sdk-runtime-cli-versioning)
 
 ## Introduction
@@ -22,6 +24,7 @@ Run the installer to install the latest version of .Net Core SDK, Runtime and CL
 
 We can use the CLI to list all installed SDK versions
 
+```bash
 Aregs-MacBook-Pro:~ aregsarkissian$ dotnet --list-sdks
 1.0.0-preview1-002702 [/usr/local/share/dotnet/sdk]
 1.0.1 [/usr/local/share/dotnet/sdk]
@@ -30,6 +33,7 @@ Aregs-MacBook-Pro:~ aregsarkissian$ dotnet --list-sdks
 2.1.302 [/usr/local/share/dotnet/sdk]
 2.2.100 [/usr/local/share/dotnet/sdk]
 3.0.100-preview3-010431 [/usr/local/share/dotnet/sdk]
+```
 
 We can see 3.0.100-preview3-010431 as the last installed version
 
@@ -67,6 +71,7 @@ The runtime version for our project is specified in the generated .csproj file
 
 We can  dump content of the demo.csproj file to see that we are targeting netcoreapp3.0 runtime
 
+```bash
 Aregs-MacBook-Pro:demo aregsarkissian$ cat demo.csproj
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
@@ -79,7 +84,7 @@ Aregs-MacBook-Pro:demo aregsarkissian$ cat demo.csproj
   </ItemGroup>
 
 </Project>
-
+```
 
 TargetFramework element in demo.csproj file specifies the dotnet core runtime version
 that we are targeting.
@@ -125,10 +130,15 @@ the solution for multi project solutions.
 
 We can create a new global.json file that specifies the sdk version 2.2.100 using the cli:
 
+```bash
 Aregs-MacBook-Pro:asp3 aregsarkissian$ dotnet new globaljson --sdk-version 2.2.100 -o demo2
+```
+
+> Note: to create global.json file inside an existing project directory, just omit the -o output directory flag.
 
 enter the project directory and the generated global.json file to see the sdk version 2.2.100 specifiedL
 
+```bash
 Aregs-MacBook-Pro:asp3 aregsarkissian$ cd demo2
 Aregs-MacBook-Pro:demo2 aregsarkissian$ cat global.json
 {
@@ -136,6 +146,7 @@ Aregs-MacBook-Pro:demo2 aregsarkissian$ cat global.json
     "version": "2.2.100"
   }
 }
+```
 
 We can check the SDK version to see that we are now using the specific 2.2.100 version
 
