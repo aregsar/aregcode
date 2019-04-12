@@ -31,109 +31,86 @@ We can add a Global exception handler middleware that can switch the exception h
 
 This middleware will redirect to an error page for full page requests that trigger and unhandled exception and return json data for ajax requests, that send the `application\json` accept header, that trigger an unhandled exception.
 
-Below you can see a sample implementation of the global exception handler middleware:
+Below you can see my sample implementation of the global exception handler middleware as an IApplicationBuilder extension:
 
 ```csharp
-private void UseGlobalExceptionHandler(IApplicationBuilder app)
+public static class GlobalExceptionHandlerExtension
 {
-    app.UseExceptionHandler(appBuilder =>
+    //This method will globally handle logging unhandled execptions.
+    //It will respond json response for ajax calls that send the json accept header
+    //otherwise it will redirect to an error page
+    public static void UseGlobalExceptionHandler(this IApplicationBuilder app
+                                                , ILogger logger
+                                                , string errorPagePath
+                                                , bool respondWithJsonErrorDetails=false)
     {
-        appBuilder.Run(async context =>
+        app.UseExceptionHandler(appBuilder =>
         {
-            var exception = context.Features.Get<IExceptionHandlerFeature>().Error;
-
-            string errorDetails = $@"{exception.Message}
-                                    {Environment.NewLine}
-                                    {exception.StackTrace}";
-
-            int statusCode = (int)HttpStatusCode.InternalServerError;
-
-            context.Response.StatusCode = statusCode;
-
-            //here is where we check the accept header for application json
-            bool requiresJsonResponse = context.Request
-                                                .GetTypedHeaders()
-                                                .Accept
-                                                .Any(t => t.Suffix.Value?.ToUpper() == "JSON"
-                                                       || t.SubTypeWithoutSuffix.Value?.ToUpper() == "JSON");
-
-            context.Response.ContentType = "application/json";
-
-            var problemDetails = new ProblemDetails
+            appBuilder.Run(async context =>
             {
-                Title = "Unexpected error",
-                Status = statusCode,
-                Detail = errorDetails,
-                Instance = Guid.NewGuid().ToString()
-            };
+                //============================================================
+                //Log Exception
+                //============================================================
+                var exception = context.Features.Get<IExceptionHandlerFeature>().Error;
 
-            var json = JsonConvert.SerializeObject(problemDetails);
+                string errorDetails = $@"{exception.Message}
+                                            {Environment.NewLine}
+                                            {exception.StackTrace}";
 
-            _logger.LogError(json);
+                int statusCode = (int)HttpStatusCode.InternalServerError;
 
-            if (requiresJsonResponse)
-            {
-                await context.Response
-                                .WriteAsync(json, Encoding.UTF8);
-            }
-            else
-            {
-                context.Response.Redirect("/Home/Error");
+                context.Response.StatusCode = statusCode;
 
-                await Task.CompletedTask;
-            }
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Unexpected Error",
+                    Status = statusCode,
+                    Detail = errorDetails,
+                    Instance = Guid.NewGuid().ToString()
+                };
+
+                var json = JsonConvert.SerializeObject(problemDetails);
+
+                logger.LogError(json);
+
+                //============================================================
+                //Return response
+                //============================================================
+                var matchText="JSON";
+
+                bool requiresJsonResponse = context.Request
+                                                    .GetTypedHeaders()
+                                                    .Accept
+                                                    .Any(t => t.Suffix.Value?.ToUpper() == matchText
+                                                            || t.SubTypeWithoutSuffix.Value?.ToUpper() == matchText);
+
+                if (requiresJsonResponse)
+                {
+                    context.Response.ContentType = "application/json; charset=utf-8";
+
+                    if(!respondWithJsonErrorDetails)
+                        json = JsonConvert.SerializeObject(new {Title = "Unexpected Error", Status = statusCode});
+
+                    await context.Response
+                                    .WriteAsync(json, Encoding.UTF8);
+                }
+                else
+                {
+                    context.Response.Redirect(errorPagePath);
+
+                    await Task.CompletedTask;
+                }
+            });
         });
-    });
+    }
 }
 ```
 
-ASP.NET Core 2.2 has infrastucture code that makes it easy to parse out the Accept header components and a convinient error data container that can be serialized to json and returned as a response.
+ASP.NET Core 2.2 has infrastucture code that makes it easy to parse out the Accept header components and an error data container that can be serialized to json and returned as a response.
 
-> Note: the sample implementation returns the error details in the response. For production builds you will want to omit the details and return a generic error message.
+The handler first logs the error using the supplied logger and then returns a response based on the content of the Accept header. An additional flag is used to limit the json data returned in the response.
 
-## Analysing the Global handler code
-
-var exception = context.Features.Get<IExceptionHandlerFeature>().Error;
- 
-var problemDetails = new ProblemDetails
-                        {
-                            Title = "Unexpected error",
-                            Status = statusCode,
-                            Detail = errorDetails,
-                            Instance = Guid.NewGuid().ToString()
-                        };
-
-## Testing the global exceptionhandler middleware
-
--To test the middleware we can create a new MVC application 
-
-`dotnet new mvc`
-
--add the required using statements for the middleware code to the startup.cs file
-
-```csharp
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System.Net;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Diagnostics;
-using System.Text;
-```
-
--add the middleware convinience method to startup.cs
-
--call the middleware convinience method inside the startup.configure method
-by replacing the app.UseExceptionHandler("/Home/Error") call
+We can now replace the original app.UseExceptionHandler("/Home/Error") call in the Startup.Configure(...) method with our own exception handler middleware:
 
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -144,8 +121,12 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     }
     else
     {
-        //replaced app.UseExceptionHandler("/Home/Error") call with:
-        UseGlobalExceptionHandler(app);
+        app.UseGlobalExceptionHandler( _logger
+                                    , errorPagePath: "/Home/Error"
+                                    , respondWithJsonErrorDetails: true);
+
+        //Replaced UseExceptionHandler with UseGlobalExceptionHandler
+        //app.UseExceptionHandler("/Home/Error");
 
         app.UseHsts();
     }
@@ -163,25 +144,53 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 }
 ```
 
--Add a new action in the home controller
+The complete source code of the demo app can be found in my Github [repo](https://github.com/aregsar/mvcapp)
+
+## Testing the global exception handler middleware
+
+To do a quick test with the new middleware I added two an Ajax action to the HomeController and modified the Privacy action in the same file, shown below:
 
 ```csharp
+public IActionResult Privacy(int? id)
+{
+    if(id.HasValue)
+        throw new Exception("privacy page exception");
+
+    return View();
+}
+
 public IActionResult ajax(int? id)
 {
     if(id.HasValue)
-        throw new Exception("test exception");
+        throw new Exception("ajax exception");
 
-    var data = new{data="ajax"};
-
-    return Json(data);
+    return Json(new {name="ajax"});
 }
 ```
 
--Change the environment to production and run the application.
+I also added a Production run configuration profile in the profiles section of the properties\launchSettings.json file. Snippet below:
 
-We can quickly test the global exception handling middleware code by running the application and issuing curl commands.
+```csharp
+ "prod": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      }
+```
+
+We can now quickly test the global exception handling middleware code by running the application and issuing curl commands.
 
 First we navigate to the https://localhost:5001/home/ajax URL to activate the ajax action normally, which returns the hard coded json data.
+
+To run the app using the prod configuration using the --launch-profile flag:
+
+```bash
+Aregs-MacBook-Pro:mvcapp aregsarkissian$ dotnet run --launch-profile prod
+```
+
+Opening another terminal window we can now send curl commands to the applications:
 
 ```bash
 Aregs-MacBook-Pro:mvcapp aregsarkissian$ curl -i -H "Accept: application/json" https://localhost:5001/home/ajax
@@ -191,7 +200,7 @@ Content-Type: application/json; charset=utf-8
 Server: Kestrel
 Transfer-Encoding: chunked
 
-{"name":"areg"}
+{"name":"ajax"}
 ```
 
 Next we can add an id parameter to the URL to activate the exception and we get the exception information as json data.
@@ -214,3 +223,11 @@ Expires: -1
   "instance": "9f238f4e-97b4-478d-9ee3-96e91cb1a93c"
 }
 ```
+
+## Conclusion
+
+It is easy to add a Global Exception handler middleware to ASP.NET Core applications to perform custome exception handling.
+
+ASP.NET Core gives us all the fascilities we need to access information in the request headers to make our own descisions on how we want to respond to unhandled application errors.
+
+Thanks
