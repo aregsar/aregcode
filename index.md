@@ -1,5 +1,5 @@
 # Posts
 
-Apr 2, 2019 by [Areg Sarkissian](https://aregcode.com/about)
+Apr 15, 2019 by [Areg Sarkissian](https://aregcode.com/about)
 
-[Spring Boot dev environment setup](https://aregcode.com/blog/2019/spring-boot-dev-environment-setup)
+[Understanding .NET Core SDK, Runtime and CLI versioning](https://aregcode.com/blog/2019/dotnetcore-understanding-sdk-runtime-cli-versioning)
