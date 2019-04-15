@@ -12,7 +12,7 @@ You can find the .NET Core SDK and Runtime downloads for your platform at:
 
 [https://dotnet.microsoft.com/download/dotnet-core](https://dotnet.microsoft.com/download/dotnet-core)
 
-Navgiate to the .NET Core version that you want to install, then download the appropriate version of the .NET Core SDK installer for your platform.
+Navigate to the .NET Core version that you want to install, then download the appropriate version of the .NET Core SDK installer for your platform.
 
 For my system I selected the macOS x64 .NET Core SDK installer for version 3.0.100-preview3-010431.
 
@@ -70,7 +70,7 @@ We can see that the default version 3.0.100-preview3-01043 is being used.
 
 ## The .NET Core Runtime version and the .csproj file
 
-The runtime version for our project is specified by the generated demo.csproj file for the project that we created above.
+The runtime version for our project is specified by the demo.csproj file that was generated for the project that we created above.
 
 We can dump the content of the demo.csproj file to inspect the Runtime version being targeted.
 
@@ -164,8 +164,8 @@ Now let's create a new Web API project inside the directory containing the globa
 dotnet new webapi
 ```
 
-> Note: we didnt specify an output directory option this time since we are running the `dotnet new` command
-inside the project directory that was created when we created the global.json file. The `dotnet new` command will use the current directory name, `demo2`, as the `.csproj` project file name.
+> Note: we didn't specify an output directory option this time since we are running the `dotnet new` command
+within the project directory that was created when we created the global.json file. The `dotnet new` command will use the current directory name, `demo2`, as the `.csproj` project file name.
 
 We can dump the content of the generated demo2.csproj project file to see the runtime version that we are targeting:
 
@@ -205,17 +205,17 @@ If an existing project already contains a global.json file, you can change its .
 
 ## Recommendations for using global.json files
 
-I have two general recomendations regarding the usage of global.json with any .NET Core project:
+I have two general recommendations regarding the usage of global.json with any .NET Core project:
 
 + Always add a global.json file to your projects to lock the SDK version used by the CLI. This will allow every project to use its own .NET Core version regardless of the default installed SDK version or the versions used in other projects.
 
-+ Always create a global.json file before using the CLI to generate a new project. This way, the project scaffolding will use the .NET Core version specified in global.json when creating the inital project files.
++ Always create a global.json file before using the CLI to generate a new project. This way, the project scaffolding will use the .NET Core version specified in global.json when creating the initial project files.
 
 ## Extending the .Net Core CLI by installing .Net Core Global tools
 
 Global tools are NuGet packages that add features to the .NET Core CLI and are unrelated to the SDK and CLI versioning.
 
-You can add features to the dotnet cli by intalling global tools as documented here:
+You can add features to the dotnet cli by installing global tools as documented here:
 
 [https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools)
 
@@ -233,6 +233,6 @@ The following articles contain source material that I used as a reference for th
 
 ## Conclusion
 
-In this post I explained how the the .NET Core SDK and Runtime versions are specified and how you can set the SDK and Runtime versions by using the CLI and the global.json and .csproj files.
+In this post I explained how the .NET Core SDK and Runtime versions are specified and how you can set the SDK and Runtime versions by using the CLI and the global.json and .csproj files.
 
 Thanks for reading.
