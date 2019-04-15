@@ -27,7 +27,7 @@ We can use the CLI to list all installed SDK versions on our system.
 Here is what is installed on my system:
 
 ```bash
-Aregs-MacBook-Pro:~ aregsarkissian$ dotnet --list-sdks
+dotnet --list-sdks
 1.0.0-preview1-002702 [/usr/local/share/dotnet/sdk]
 1.0.1 [/usr/local/share/dotnet/sdk]
 1.0.4 [/usr/local/share/dotnet/sdk]
@@ -42,7 +42,7 @@ We can see 3.0.100-preview3-010431 as the last installed version
 We can also use the CLI to show the default SDK version that will be used by the CLI
 
 ```bash
-Aregs-MacBook-Pro:~ aregsarkissian$ dotnet --version
+dotnet --version
 3.0.100-preview3-010431
 ```
 
@@ -54,7 +54,7 @@ Let's use the dotnet cli to create a new Web API project that will
 use the default latest installed SDK version:
 
 ```bash
-Aregs-MacBook-Pro:asp3 aregsarkissian$ dotnet new webapi -o demo
+dotnet new webapi -o demo
 ```
 
 The -o flag specifies a project directory that will be created when we run the command.
@@ -62,8 +62,8 @@ The -o flag specifies a project directory that will be created when we run the c
 We can enter project directory and check the SDK version:
 
 ```bash
-Aregs-MacBook-Pro:asp3 aregsarkissian$ cd demo
-Aregs-MacBook-Pro:demo aregsarkissian$ dotnet --version
+cd demo
+dotnet --version
 3.0.100-preview3-010431
 ```
 
@@ -76,7 +76,7 @@ The runtime version for our project is specified in the generated demo.csproj fi
 We can dump content of the demo.csproj file to see that we are targeting netcoreapp3.0 runtime:
 
 ```bash
-Aregs-MacBook-Pro:demo aregsarkissian$ cat demo.csproj
+cat demo.csproj
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
@@ -99,7 +99,7 @@ Just as we did for the SDK versions, We can list all the installed .NET Core Run
 
 On my system it looks like this:
 
-Aregs-MacBook-Pro:~ aregsarkissian$ dotnet --list-runtimes
+dotnet --list-runtimes
 Microsoft.AspNetCore.All 2.1.2 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.All]
 Microsoft.AspNetCore.All 2.2.0 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.All]
 Microsoft.AspNetCore.App 2.1.2 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]
@@ -134,7 +134,7 @@ So by adding a global.json file at the root of the project or the root of the so
 As an example lets use the CLI to create a new global.json file that specifies the .NET Core SDK version 2.2.100:
 
 ```bash
-Aregs-MacBook-Pro:asp2 aregsarkissian$ dotnet new globaljson --sdk-version 2.2.100 -o demo2
+dotnet new globaljson --sdk-version 2.2.100 -o demo2
 ```
 
 The -o flag specifies that the output directory to place the global.json file in.
@@ -142,8 +142,8 @@ The -o flag specifies that the output directory to place the global.json file in
 We can enter the project directory and the dump the generated global.json file to see that the SDK version 2.2.100 is specified:
 
 ```bash
-Aregs-MacBook-Pro:asp3 aregsarkissian$ cd demo2
-Aregs-MacBook-Pro:demo2 aregsarkissian$ cat global.json
+cd demo2
+cat global.json
 {
   "sdk": {
     "version": "2.2.100"
@@ -154,14 +154,14 @@ Aregs-MacBook-Pro:demo2 aregsarkissian$ cat global.json
 We can also check the SDK version using the CLI, from within the demo2 directory, to see that we are now using the specific 2.2.100 version:
 
 ```bash
-Aregs-MacBook-Pro:demo2 aregsarkissian$ dotnet --version
+dotnet --version
 2.2.100
 ```
 
 Now let's create a new Web API project inside the directory containing the global.json file:
 
 ```bash
-Aregs-MacBook-Pro:demo2 aregsarkissian$ dotnet new webapi
+dotnet new webapi
 ```
 
 > Note: we didnt specify an output directory option this time since we are running the `dotnet new` command
@@ -170,7 +170,7 @@ inside the project directory that was created when we created the global.json fi
 We can dump the content of the generated demo2.csproj project file to see that we are now targeting netcoreapp2.2:
 
 ```bash
-Aregs-MacBook-Pro:demo2 aregsarkissian$ cat demo2.csproj
+cat demo2.csproj
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
@@ -195,8 +195,8 @@ When we want to add a global.json file to an already existing project we can go 
 As an example I can add a global.json file to the first demo project that we created, like so:
 
 ```bash
-Aregs-MacBook-Pro:asp2 aregsarkissian$ cd demo
-Aregs-MacBook-Pro:demo aregsarkissian$ dotnet new globaljson --sdk-version 3.0.100-preview3-010431
+cd demo
+dotnet new globaljson --sdk-version 3.0.100-preview3-010431
 ```
 
 If an existing project already contains a global.json file, you can change its .NET Core version, going forward, by changing the version specified inside the global.json file.
@@ -205,9 +205,7 @@ If an existing project already contains a global.json file, you can change its .
 
 I have two general recomendations regarding the usage of global.json with any .NET Core project:
 
-+ Always add a global.json file to your projects to 
-control the SDK version used by the CLI, specially when you install multiple versions of the
-framework on your system. This will allow every project to use its own .NET Core version regardless of the default instaled version or versions used in other projects. So for example if you install the latest preview version of the framework on your system, your existing projects can still use the older version specified by their local global.json files.
++ Always add a global.json file to your projects to lock the SDK version used by the CLI, especially when you install multiple versions of the framework on your system. This will allow every project to use its own .NET Core version regardless of the default installed version or versions used in other projects. So for example if you install the latest preview version of the framework on your system, your existing projects can still use the older version specified by their local global.json files.
 
 + Always create a global.json file before using the CLI to 
 generate a new project. This way, the project scaffolding uses the .NET Core version specified in global.json when creating the inital project  files.
@@ -226,15 +224,14 @@ https://github.com/natemcmaster/dotnet-tools
 
 ## References used for this article
 
+The following articles contain source material that I used as a reference for this article:
 
+[https://elanderson.net/2018/09/controlling-net-cores-sdk-version/](https://elanderson.net/2018/09/controlling-net-cores-sdk-version/)
+
+[https://andrewlock.net/the-net-core-2-0-preview-1-version-numbers-and-global-json/](https://andrewlock.net/the-net-core-2-0-preview-1-version-numbers-and-global-json/)
 
 ## Conclusion
 
-In this post I detailed What the .Net Core SDK and Runtime versions are and how you can select the SDK and Runtime versions by using the CLI and the global.json and .csproj files.
+In this post I explained how the the .NET Core SDK and Runtime versions are specified and how you can set the SDK and Runtime versions by using the CLI and the global.json and .csproj files.
 
-Thanks for reading
-
-
-
-
-
+Thanks for reading.
