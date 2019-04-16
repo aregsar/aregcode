@@ -1,29 +1,30 @@
-# dotnetcore aspnet mvc global error handling
+# ASP.NET Core MVC Global Error Handling for HTML and AJAX Endpoints
 
-[dotnetcore aspnet mvc global error handling](https://aregsar.com/blog/2019/dotnetcore-aspnet-mvc-global-error-handling)
+[ASP.NET Core MVC Global Error Handling with HTML or JSON Response](https://aregsar.com/blog/2019/dotnetcore-aspnet-mvc-global-error-handling)
 
-# Introduction
+## Introduction
 
-It is critical to have global exception handling for ASP.NET Core applications when
-Exceptions are not handled by application logic.
+It is critical to have global exception handling for ASP.NET Core applications to respond appropriatly to exceptions that are not handled by application logic.
 
-For production releases, this will allow us to log all unhandled exceptions and also provide a user friendly response to the user.
+Global exception handling allows us to log all unhandled exceptions in a central location in our application and then provide a user friendly response to the user.
 
-ASP.NET Core Web API projects by default return json data for API endpoint request.
-When an unhandled exception occures the exception error is also returned as json data. Clients of Web APIs expect json responses and can handle json error responses in a normal fashion.
+In ASP.NET MVC projects, there are generally two types of content returned to the web browser. There are normal web page requests that require returning HTML content and there are AJAX requests that normally require returning JSON formatted content.
 
-In ASP.NET MVC projects, where we are serving web pages, global exception handling becomes a little more complicated.
+When the browser requests a HTML rendered page and an exception occures that the application can not handle, we generally redirect the browser to an HTML error page.
 
-Generally we serve HTML pages to the client web browser, so if an unhandled exception occures we can just redirect the browser to an HTML error page.
+However, when the browser makes an AJAX request that expects a JSON response then we need to return a JSON error response instead of redirecting to an HTML error page.
 
-But many MVC web applications also make ajax request to the same application. Usually the format of the response requested by these ajax calls is json. So when an unhandled exception occures on the server, we need to return a json response instead of redirecting to an html error page.
+Given this, in a global exception handler, we need to distinguish between normal web page requests and ajax requests that expect JSON, so that we can return the appropriate error response.
 
-Given this, we need to figure out a way in our MVC projects to distinguish between normal web page requests and ajax requests.
+## Using the Accept HTTP request header in the Global Exception Handler
 
-The way we can do that is with the HTTP Accept header sent by ajax requests.
-Our MVC application can determine whether to send a json error response or redirect to an error page based on the value of the Accept header.
+The way we can detect if a request expects a JSON response is by using the HTTP __Accept__ header sent by AJAX requests.
 
-If the `Accept` header value contains the text `application/json` then the application needs to respond with a json error response.
+The global exception handler in our MVC application can determine whether to send a JSON error response or redirect to a HTML error page based on the value of the Accept header.
+
+If the __Accept__ header value contains the text `application/json` then the handler needs to respond with a JSON error response.
+
+> Note: Detecting if a request is a AJAX request is not the same as detecting whether the request accepts a JSON response. To detect an AJAX request you can check for the __X-Requested-With__ header for the 'xmlhttprequest' value .
 
 ## Adding a Global exception handler middleware
 
