@@ -191,7 +191,7 @@ dotnet run --launch-profile prod
 
 We can now quickly test the global exception handling middleware code by issuing `curl` commands against the `Ajax` action endpoints.
 
-To do so we can open a nee terminal tab and curl to the `https://localhost:5001/home/ajax` URL:
+To do so we can open a new terminal tab and curl to the `https://localhost:5001/home/ajax` URL:
 
 ```bash
 curl -i -H "Accept: application/json" https://localhost:5001/home/ajax
@@ -227,15 +227,21 @@ Expires: -1
 }
 ```
 
-This time we see the unhandled exception is logged as JSON data to the console by the global exception handler.
+This time can see the response now includes the JSON formatted exception data returned by the global exception handler.
+
+Also if we look at the terminal tab where we ran the application, we can see that the unhandled exception is logged as JSON data to the console by the global exception handler.
 
 Next we can use the web browser to test the `Privacy` action methods with the global exception handler.
 
-We can use the web browser to navigate to the Privacy action method endpoint `https://localhost:5001/home/privacy` URL.
+We can use the web browser to navigate to the Privacy action method endpoint URL:
+
+[https://localhost:5001/home/privacy](https://localhost:5001/home/privacy)
 
 We can see the normal privacy HTML page response displayed in the browser.
 
-Next we add an the id parameter to the URL to activate the exception in the Privacy action method and use the web browser to navigate to the `https://localhost:5001/home/privacy/1` URL.
+Next we add an the id parameter to the URL to activate the exception in the Privacy action method and use the web browser to navigate to the URL:
+
+[https://localhost:5001/home/privacy/1](https://localhost:5001/home/privacy/1)
 
 This time we can see that we are redirected to a server error page as usual for HTML endpoints that throw unhandled exeptions.
 
