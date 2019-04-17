@@ -12,27 +12,29 @@ In ASP.NET MVC projects, there are generally two types of content returned to th
 
 When the browser requests a HTML rendered page and an exception occurs that the application cannot handle, we generally redirect the browser to an HTML error page.
 
-However, when the browser makes an AJAX request that expects a JSON response then we need to return a JSON error response instead of redirecting to an HTML error page.
+However, when the browser makes an AJAX request that expects a JSON response then we need to return a JSON error response instead of redirecting to a HTML error page.
 
-Given this, in a global exception handler, we need to distinguish between normal web page requests and AJAX requests that expect JSON, so that we can return the appropriate error response.
+Given this, in a global exception handler, we need to distinguish between normal web page requests, so that we can return the appropriate error response.
 
 ## Using HTTP request headers in the Global Exception Handler
 
-The way we can detect if a request expects a JSON response is by inspecting the HTTP __Accept__ header sent by AJAX requests.
+The way we can detect if an AJAX request expects a JSON response is by inspecting the HTTP __Accept__ header sent by the request.
 
 The global exception handler in our MVC application can determine whether to send a JSON error response or redirect to a HTML error page based on the value of the Accept header.
 
-If the Accept header value contains the text `application/json` then the handler needs to respond with a JSON error response.
+If an Accept header exists that contains the value `application/json`, then the handler needs to respond with a JSON error response.
 
-> Note: Detecting if a request is a AJAX request is not the same as detecting whether the request accepts a JSON response. To detect an AJAX request you can check for the __X-Requested-With__ request header for the `'xmlhttprequest'` value.
+> Note: Detecting if a request is an AJAX request is not the same as detecting whether the request accepts a JSON response. To detect an AJAX request you can check for a __X-Requested-With__ request header that contains the value `xmlhttprequest`.
 
 ## Adding a Global exception handler middleware
 
-We can add a Global exception handler middleware that can access the unhandled exception and the request headers to decide how to format the exception data for the response.
+We can add a Global exception handler middleware that can access the unhandled exception and the request headers from the HTTP request context to decide how to format the exception data for the response.
 
-This middleware will redirect to a HTML error page for full page requests or return JSON data for requests, that contain the `application\json` Accept header.
+This middleware will return JSON data for requests that contain the `application\json` Accept header and otherwise will redirect to an HTML error page.
 
-Below you can see my sample implementation of the global exception handler middleware implemented as an `IApplicationBuilder` extensio method:
+Also the middleware will serialize and log the exception information.
+
+Below you can see my sample implementation of the global exception handler middleware implemented as an `IApplicationBuilder` extension method:
 
 ```csharp
 public static class GlobalExceptionHandlerExtension
@@ -55,8 +57,8 @@ public static class GlobalExceptionHandlerExtension
                 var exception = context.Features.Get<IExceptionHandlerFeature>().Error;
 
                 string errorDetails = $@"{exception.Message}
-                                            {Environment.NewLine}
-                                            {exception.StackTrace}";
+                                         {Environment.NewLine}
+                                         {exception.StackTrace}";
 
                 int statusCode = (int)HttpStatusCode.InternalServerError;
 
@@ -83,15 +85,15 @@ public static class GlobalExceptionHandlerExtension
                                                     .GetTypedHeaders()
                                                     .Accept
                                                     .Any(t => t.Suffix.Value?.ToUpper() == matchText
-                                                            || t.SubTypeWithoutSuffix.Value?.ToUpper() == matchText);
+                                                              || t.SubTypeWithoutSuffix.Value?.ToUpper() == matchText);
 
                 if (requiresJsonResponse)
                 {
                     context.Response.ContentType = "application/json; charset=utf-8";
 
                     if(!respondWithJsonErrorDetails)
-                        json = JsonConvert.SerializeObject(new {Title = "Unexpected Error", Status = statusCode});
-
+                        json = JsonConvert.SerializeObject(new { Title = "Unexpected Error"
+                                                               , Status = statusCode});
                     await context.Response
                                     .WriteAsync(json, Encoding.UTF8);
                 }
@@ -109,7 +111,9 @@ public static class GlobalExceptionHandlerExtension
 
 ASP.NET Core 2.2 has infrastructure code that makes it easy to parse out the Accept header components and an error data container that can be serialized to JSON and returned as a response.
 
-The handler first logs the error using the supplied logger and then returns a response based on the content of the Accept header. An additional flag is used to limit the JSON data returned in the response.
+The handler first logs the error using the supplied logger and then returns the proper response based on the content of the Accept header. 
+
+An additional flag is used to limit the JSON data returned in the response.
 
 We can now replace the original `app.UseExceptionHandler("/Home/Error")` call in the `Startup.Configure(...)` method with our own exception handler middleware:
 
@@ -149,7 +153,11 @@ The complete source code of the demo app can be found in my Github [https://gith
 
 ## Testing the Global Exception Handler middleware
 
-I added an `Ajax` action to the `HomeController` and modified the `Privacy` action in the same file, to do a quick test with the global exception handler middleware installed.
+To do a quick test of the installed the global exception handler middleware, I added an `Ajax` action method to the `HomeController` class. The method normally returns JSON data but throws an exception if the route contains the optional id parameter.
+
+I also modified the `Privacy` action method that normally returns the Privacy view but throws an exception if the route contains the id parameter.
+
+Here is the code for these action methods:
 
 ```csharp
 public IActionResult Privacy(int? id)
@@ -169,9 +177,11 @@ public IActionResult Ajax(int? id)
 }
 ```
 
-Looking in the `Startup.Configure(...)` method we can see that the global exception handler middleware is installed in the middleware pipeline only for production builds.
+Now, looking in the `Startup.Configure(...)` method we can see that the global exception handler middleware is installed in the middleware pipeline only for production builds.
 
-Therefore, to run in production mode, I added a Production run configuration profile in the profiles section of the properties\launchSettings.json file. Snippet below:
+Therefore, to run the server in production mode, I added a Production run configuration profile in the profiles section of the properties\launchSettings.json file.
+
+Here is the production configuration from the launchSettings file:
 
 ```csharp
  "prod": {
@@ -183,15 +193,15 @@ Therefore, to run in production mode, I added a Production run configuration pro
       }
 ```
 
-To run the app using the prod configuration we can use the dotnet run command with the --launch-profile flag:
+After adding the configuration profile we can use the dotnet run command with the --launch-profile option to run the app in production mode.
 
 ```bash
 dotnet run --launch-profile prod
 ```
 
-We can now quickly test the global exception handling middleware code by issuing `curl` commands against the `Ajax` action endpoints.
+We can now quickly test the global exception handling middleware code by issuing `curl` commands against the `Ajax` action endpoint.
 
-To do so we can open a new terminal tab and curl to the `https://localhost:5001/home/ajax` URL:
+To do so we can open a new terminal tab and curl a request to the `https://localhost:5001/home/ajax` URL:
 
 ```bash
 curl -i -H "Accept: application/json" https://localhost:5001/home/ajax
@@ -206,7 +216,7 @@ Transfer-Encoding: chunked
 
 We can see the normal JSON response of the Ajax action method since there was no unhandled exception.
 
-Next we can add an id parameter to the URL to activate the exception in the Ajax action method.
+Next we can add an id parameter to the URL to activate the exception in the Ajax action method:
 
 ```bash
 curl -i -H "Accept: application/json" https://localhost:5001/home/ajax/1
@@ -227,19 +237,17 @@ Expires: -1
 }
 ```
 
-This time can see the response now includes the JSON formatted exception data returned by the global exception handler.
+This time we can see that the response includes the JSON formatted exception data returned by the global exception handler.
 
 Also if we look at the terminal tab where we ran the application, we can see that the unhandled exception is logged as JSON data to the console by the global exception handler.
 
-Next we can use the web browser to test the `Privacy` action methods with the global exception handler.
-
-We can use the web browser to navigate to the Privacy action method endpoint URL:
+Next we can quickly test the global exception handler when sending requests to the Privacy action method, by using the web browser to navigate to the Privacy endpoint URL:
 
 [https://localhost:5001/home/privacy](https://localhost:5001/home/privacy)
 
 We can see the normal privacy HTML page response displayed in the browser.
 
-Next we add an the id parameter to the URL to activate the exception in the Privacy action method and use the web browser to navigate to the URL:
+Finally we can add the id parameter to the Privacy endpoint URL and navigate to the URL to activate the exception in the Privacy action method:
 
 [https://localhost:5001/home/privacy/1](https://localhost:5001/home/privacy/1)
 
