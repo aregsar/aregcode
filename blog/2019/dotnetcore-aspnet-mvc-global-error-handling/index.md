@@ -1,20 +1,20 @@
 # ASP.NET Core MVC Global Error Handling for HTML and AJAX Endpoints
 
-[ASP.NET Core MVC Global Error Handling with HTML or JSON Response](https://aregsar.com/blog/2019/dotnetcore-aspnet-mvc-global-error-handling)
+April 16, 2019 by [Areg Sarkissian](https://aregcode.com/about)
 
 ## Introduction
 
-It is critical to have global exception handling for ASP.NET Core applications to respond appropriatly to exceptions that are not handled by application logic.
+It is critical to have global exception handling for ASP.NET Core applications to respond appropriately to exceptions that are not handled by application logic.
 
 Global exception handling allows us to log all unhandled exceptions in a central location in our application and then provide a user friendly response to the user.
 
 In ASP.NET MVC projects, there are generally two types of content returned to the web browser. There are normal web page requests that require returning HTML content and there are AJAX requests that normally require returning JSON formatted content.
 
-When the browser requests a HTML rendered page and an exception occures that the application can not handle, we generally redirect the browser to an HTML error page.
+When the browser requests a HTML rendered page and an exception occurs that the application cannot handle, we generally redirect the browser to an HTML error page.
 
 However, when the browser makes an AJAX request that expects a JSON response then we need to return a JSON error response instead of redirecting to an HTML error page.
 
-Given this, in a global exception handler, we need to distinguish between normal web page requests and ajax requests that expect JSON, so that we can return the appropriate error response.
+Given this, in a global exception handler, we need to distinguish between normal web page requests and AJAX requests that expect JSON, so that we can return the appropriate error response.
 
 ## Using HTTP request headers in the Global Exception Handler
 
@@ -37,7 +37,7 @@ Below you can see my sample implementation of the global exception handler middl
 ```csharp
 public static class GlobalExceptionHandlerExtension
 {
-    //This method will globally handle logging unhandled execptions.
+    //This method will globally handle logging unhandled execeptions.
     //It will respond json response for ajax calls that send the json accept header
     //otherwise it will redirect to an error page
     public static void UseGlobalExceptionHandler(this IApplicationBuilder app
@@ -107,9 +107,9 @@ public static class GlobalExceptionHandlerExtension
 }
 ```
 
-ASP.NET Core 2.2 has infrastucture code that makes it easy to parse out the Accept header components and an error data container that can be serialized to json and returned as a response.
+ASP.NET Core 2.2 has infrastructure code that makes it easy to parse out the Accept header components and an error data container that can be serialized to JSON and returned as a response.
 
-The handler first logs the error using the supplied logger and then returns a response based on the content of the Accept header. An additional flag is used to limit the json data returned in the response.
+The handler first logs the error using the supplied logger and then returns a response based on the content of the Accept header. An additional flag is used to limit the JSON data returned in the response.
 
 We can now replace the original `app.UseExceptionHandler("/Home/Error")` call in the `Startup.Configure(...)` method with our own exception handler middleware:
 
@@ -149,7 +149,7 @@ The complete source code of the demo app can be found in my Github [https://gith
 
 ## Testing the Global Exception Handler middleware
 
-I added an `Ajax` action to the `HomeController` and modified the `Privacy` action in the same file, to do a quick test with the global exception handler  middleware installed.
+I added an `Ajax` action to the `HomeController` and modified the `Privacy` action in the same file, to do a quick test with the global exception handler middleware installed.
 
 ```csharp
 public IActionResult Privacy(int? id)
@@ -204,7 +204,7 @@ Transfer-Encoding: chunked
 {"name":"ajax"}
 ```
 
-We can see a the normal JSON response of the Ajax action method since there was no unhandled exeption.
+We can see the normal JSON response of the Ajax action method since there was no unhandled exception.
 
 Next we can add an id parameter to the URL to activate the exception in the Ajax action method.
 
@@ -243,12 +243,12 @@ Next we add an the id parameter to the URL to activate the exception in the Priv
 
 [https://localhost:5001/home/privacy/1](https://localhost:5001/home/privacy/1)
 
-This time we can see that we are redirected to a server error page as usual for HTML endpoints that throw unhandled exeptions.
+This time we can see that we are redirected to a server error page as usual for HTML endpoints that throw unhandled exceptions.
 
 ## Conclusion
 
-It is easy to add a globalexception handling middleware to ASP.NET Core MVC applications to perform custom exception handling.
+It is easy to add a global exception handling middleware to ASP.NET Core MVC applications to perform custom exception handling.
 
-ASP.NET Core gives us all the fascilities that we need to access information in the request headers and the exception data to make our own descision on how we want to respond to unhandled application errors.
+ASP.NET Core gives us all the facilities that we need to access information in the request headers and the exception data to make our own decision on how we want to respond to unhandled application errors.
 
 Thanks for reading
