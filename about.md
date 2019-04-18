@@ -1,48 +1,63 @@
 # About Me
 
-I am principal software architect specializing in ASP.NET Core, Spring Boot and Laravel enterprise web application architecture and development.
+I am a principal software architect specializing in ASP.NET Core, Spring Boot and Laravel enterprise web application architecture and development.
 
 In the past I have developed mission critical software for organizations as diverse as America Online, Autobytel and Walt Disney.
 
 I helped these organizations design robust, testable and maintainable application code and mentored development teams on enterprise software development best practices.
 
-I strive to use immutable, composable, stateless and side effect free code to make code easy to reason about, reduce cognitive load, reduce the need for debugging and make testing easier.
+I strive to use immutable, composable, stateless and side effect free code to make code easy to reason about and make code easy to test and debug.
 
-I am a proponent of the following in no particular order:
+I optimize my code for readablity by using vertical and symetrical code organization, reducing loops, conditionals, branching and deep nesting and writing self documenting code.  
 
-Kanban
-WIP limits
-Pomodoro technique
-Continious delivery
-Vertical slice architecture
-Immutable value objects
-Immutable Infrastructure
-Functional programming
-Functional testing
-Command Query Separation
-One way data binding
-Redux
+I am a proponent of the following that help efficiently deliver reliable code:
 
-I am also a big fan of Bertrand Meyer the inventor of the Eiffel programming language and the concepts of design by contract and command quey separation.
++ Kanban
++ WIP limits
++ Pomodoro technique
++ Continious delivery
++ Command line tooling
++ Vertical slice architecture
++ Immutable value objects
++ Immutable Infrastructure
++ Functional programming
++ Functional testing
++ Command Query Separation
++ One way data binding
++ Redux
 
-My Career Chronology:
+Currently I am working on command line tooling to improve the developer experience of infrastructure provisioning and application deployment on the Digital Ocean platform.
+
+I am also working on __Docker__ based tooling to improve the  development experience for web developers.
+
+## My Career Chronology
+
+__Senior Developer__
 
 Oct. 2016 – Oct. 2018
-Senior Developer
+
 Walt Disney Parks and Rides
 
+__Senior Developer__
+
 Apr. 2015 – Sep. 2016
-Senior Developer
+
 Walt Disney Theatrical Systems
 
+__Senior Staff Developer__
+
 Mar. 2006 – Aug. 2014
-Senior Staff Developer
+
 Autobytel
 
+__Software Architect__
+
 Dec. 2003 – Feb. 2006
-Software Architect
+
 FoodFlight
 
-Principal Software Engineer
-America Online
+__Principal Software Engineer__
+
 Nov. 1999 – Nov. 2003
+
+America Online
