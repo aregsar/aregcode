@@ -2,8 +2,6 @@
 
 April 11, 2019 by [Areg Sarkissian](https://aregcode.com/about)
 
-[Understanding .NET Core Endpoint Routing](https://aregcode.com/blog/2019/dotnetcore-understanding-aspnet-endpoint-routing)
-
 ## Introduction
 
 In this post I will explain the new Endpoint Routing feature that has been added to the ASP.NET Core middleware pipeline starting with version 2.2 and how it is evolving through to the upcoming version 3.0 that is at preview 3 at present time.
@@ -356,7 +354,7 @@ Currently the route mapping configuration parameters are passed into the endpoin
 
 Either way the attached authorization metadata will be availailble for the endpoint resolver middleware to use.
 
-Below is an example of the version 3 preview 3 `Startup.Configure` method where I have added a new `/hello` route
+Below is an example of the version 3 preview 3 `Startup.Configure` method where I have added a new `/secret` route
 to the endpoint resolver middleware route map configuration lambda parameter:
 
 ```csharp
@@ -376,10 +374,10 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         //Mapped route that gets attaced authorization metadata using the RequireAuthorization extension method.
         //This metadata will be added to the resolved endpoint for this route by the endpoint resolver
         //The app.UseAuthorization() middleware later in the pipeline will get the resolved endpoint
-        //for the /hello route and use the authorization metadata attached to the endpoint
-        routes.MapGet("/hello", context =>
+        //for the /secret route and use the authorization metadata attached to the endpoint
+        routes.MapGet("/secret", context =>
         {
-            return context.Response.WriteAsync("hello");
+            return context.Response.WriteAsync("secret");
         }).RequireAuthorization(new AuthorizeAttribute(){ Roles = "admin" });
     });
 
@@ -387,14 +385,22 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
     //the Authorization middleware check the resolved endpoint object
     //to see if it requires authorization. If it does as in the case of
-    //the "/hello" route, then it will authorize the route, if it the user is in the admin role
+    //the "/secret" route, then it will authorize the route, if it the user is in the admin role
     app.UseAuthorization();
 
     //the framework implicitly dispaches the endpoint here.
 }
 ```
 
-You can see that I am using the `RequireAuthorization` method to add an `AuthorizeAttribute` attribute to the `/hello` route. This route will then only be authorized to be dispactched for a user in the admin role, by the authorization middleware, that comes before the endpoint dispatch occurs.
+You can see that I am using the `RequireAuthorization` method to add an `AuthorizeAttribute` attribute to the `/secret` route. This route will then only be authorized to be dispactched for a user in the admin role, by the authorization middleware, that comes before the endpoint dispatch occurs.
+
+## References used for this article
+
+The following articles contain source material that I used as a reference for this article:
+
+[https://devblogs.microsoft.com/aspnet/aspnet-core-3-preview-2/](https://devblogs.microsoft.com/aspnet/aspnet-core-3-preview-2/)
+
+[https://www.stevejgordon.co.uk/asp-net-core-first-look-at-global-routing-dispatcher](https://www.stevejgordon.co.uk/asp-net-core-first-look-at-global-routing-dispatcher)
 
 ## Conclusion
 

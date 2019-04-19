@@ -1,5 +1,9 @@
 # Posts
 
+Apr 19, 2019
+
+[Understanding .NET Core Endpoint Routing](https://aregcode.com/blog/2019/dotnetcore-understanding-aspnet-endpoint-routing)
+
 Apr 16, 2019
 
 [ASP.NET Core MVC Global Error Handling with HTML or JSON Response](https://aregcode.com/blog/2019/dotnetcore-aspnet-mvc-global-error-handling)
