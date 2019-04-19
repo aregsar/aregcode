@@ -243,13 +243,13 @@ Also if we look at the terminal tab where we ran the application, we can see tha
 
 Next we can quickly test the global exception handler when sending requests to the Privacy action method, by using the web browser to navigate to the Privacy endpoint URL:
 
-[https://localhost:5001/home/privacy](https://localhost:5001/home/privacy)
+`https://localhost:5001/home/privacy`
 
 We can see the normal privacy HTML page response displayed in the browser.
 
 Finally we can add the id parameter to the Privacy endpoint URL and navigate to the URL to activate the exception in the Privacy action method:
 
-[https://localhost:5001/home/privacy/1](https://localhost:5001/home/privacy/1)
+`https://localhost:5001/home/privacy/1`
 
 This time we can see that we are redirected to a server error page as usual for HTML endpoints that throw unhandled exceptions.
 
