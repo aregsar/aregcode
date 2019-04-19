@@ -314,9 +314,9 @@ The `UseRouting` endpoint route resolver will still have access to the mappings 
 
 ## Adding Endpoint routing middleware to the DI container
 
-Endpoint routing also requires adding the middleware to the DI container in the `Startup.ConfigureServices` method.
+To use endpoint routing, we also need to add the middleware to the DI container in the `Startup.ConfigureServices` method.
 
-### ConfigureServices method in Version 2.2
+### ConfigureServices in Version 2.2
 
 For version 2.2 of the framework we need to add the call to `services.AddRouting()` method shown below:
 
@@ -330,7 +330,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-### ConfigureServices method in Version 3 preview 3
+### ConfigureServices in Version 3 preview 3
 
 For version 3 preview 3 build of the framework, endpoint routing already comes configured under the covers in the `AddMvc()` extension method:
 
@@ -344,19 +344,20 @@ public void ConfigureServices(IServiceCollection services)
 
 ## Setting up Endpoint Authorization using endpoint routing and route mappings
 
-When working with the version 3 preview 3 release we can attach autorization metadata to an endpoint using the route mappings.
+When working with the version 3 preview 3 release we can attach autorization metadata to an endpoint. We do this using the route mappings configuration fluent API `RequireAuthorization` method.
 
-Then any middleware in the pipeline after the route resolution middleware can access this authorization data by accessing the resolved endpoint object.
+The endpoint routing resolver will access this metadata when processing a request and add it to the Endpoint object that it sets on the httpcontext.
 
-In particular the authorization middleware can use this data to make autorization deciesions.
+Any middleware in the pipeline after the route resolution middleware can access this authorization data by accessing the resolved Endpoint object.
+
+In particular the authorization middleware can use this data to make authorization deciesions.
 
 Currently the route mapping configuration parameters are passed into the endpoint route resolver middleware, but as previously mentioned, in the future releases, the route mapping configuration will be passed into the endpoint dispatcher middleware.
 
-Either way the attached metadata can be inspected by the middleware after the endpoint resolver middleware.
+Either way the attached authorization metadata will be availailble for the endpoint resolver middleware to use.
 
-Here is the V3 preview 3 Startup.Configure method where I have added a new /secret route
-to the endpoint resolver middleware configurartion.
-This route  will only be authorized for the admin role by the authorization middleware at the end of the method.
+Below is an example of the version 3 preview 3 `Startup.Configure` method where I have added a new `/hello` route
+to the endpoint resolver middleware route map configuration lambda parameter:
 
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -376,54 +377,24 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         //This metadata will be added to the resolved endpoint for this route by the endpoint resolver
         //The app.UseAuthorization() middleware later in the pipeline will get the resolved endpoint
         //for the /hello route and use the authorization metadata attached to the endpoint
-        routes.MapGet("/secret", context =>
+        routes.MapGet("/hello", context =>
         {
-            return context.Response.WriteAsync("Secret");
+            return context.Response.WriteAsync("hello");
         }).RequireAuthorization(new AuthorizeAttribute(){ Roles = "admin" });
     });
 
     app.UseAuthentication();
 
+    //the Authorization middleware check the resolved endpoint object
+    //to see if it requires authorization. If it does as in the case of
+    //the "/hello" route, then it will authorize the route, if it the user is in the admin role
     app.UseAuthorization();
 
     //the framework implicitly dispaches the endpoint here.
 }
 ```
 
-We can envision being able to add similar functionality where we can have a middlware that will only be applied to an endpoint if the endpoint route mapping is configured to allow that middleware to process the request.
-
-Here is a pseudocode that illustrates this using a ficticious AllowedMiddleware() route configuration extension method.
-
-```csharp
-public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-{
-    f (env.IsDevelopment())
-        app.UseDeveloperExceptionPage();
-    else
-        app.UseHsts();
-
-    app.UseHttpsRedirection();
-
-    app.UseRouting(routes =>
-    {
-        routes.MapControllers();
-
-        //the MyMiddleware middleware will only apply to this route and
-        //will just passthrough all other routes
-        routes.MapGet("/mine", context =>
-        {
-            return context.Response.WriteAsync("mine");
-        }).AllowedMiddleware("MyMiddleware");
-    });
-
-    app.UseAuthentication();
-
-    app.UseAuthorization();
-
-    //this middlewre will inspect the resolved Endpoint object and
-    //only process the request if it indicates a GET request to the '/mine' URL
-    app.UseMyMiddleware();
-```
+You can see that I am using the `RequireAuthorization` method to add an `AuthorizeAttribute` attribute to the `/hello` route. This route will then only be authorized to be dispactched for a user in the admin role, by the authorization middleware, that comes before the endpoint dispatch occurs.
 
 ## Conclusion
 
