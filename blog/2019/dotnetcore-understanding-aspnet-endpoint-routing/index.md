@@ -12,13 +12,15 @@ Prior to endpoint routing the routing reslotion for an ASP.NET Core application 
 
 It is particularly usefull to have this route information available for example in a CORS or authorization middleware to use the information as a factor in the authorization process.
 
-Another potential usage of endpoint routing is that we can simulate the ability of frameworks like Laravel and Phoenix to can assign different middleware pipelines to different routes. 
+Another potential usage of endpoint routing is that we can simulate the ability of frameworks like Laravel and Phoenix that can assign different middleware pipelines to process different routes. 
 
-With endpoint routing we can simulate this behavior by dynamically determining which middleware in the ASP.NET Core static middleware pipeline should apply to a route resolved by the endpoint routing middleware.
+With endpoint routing we can simulate this behavior by dynamically determining, based on route data, which middleware in the ASP.NET Core static middleware pipeline should apply to a route resolved by the endpoint routing middleware.
 
 Endpoint routing allows us to decouple the route matching logic from the MVC middleware, moving it into its own middleware. It allows the MVC middleware to focus on its responsablity of dispatching the request to the particular controller action method that is resolved by the endpoint routing middleware.
 
-Thus endpoint routing was born to allow the route resolution to happen earlier in the pipeline in a separate endpoint routing middleware that can be placed at any point in the pipeline (usually after the exception handling and static content serving middleware) after which other middleware in the pipeline, including the final MVC action method dispatcher middleware, can access the resolved route information.
+## Endpoint routing in ASP.NET Core
+
+Endpoint routing was born to allow the route resolution to happen earlier in the pipeline in a separate endpoint routing middleware that can be placed at any point in the pipeline (usually after the exception handling and static content serving middleware) after which other middleware in the pipeline can access the resolved route data.
 
 The endpoint routing middleware API is evolving with the upcoming 3.0 version of the .NET Core framework. For that reason, the API that I will describe in the following sections may not be the final version of the feature. However the over all concept and understanding of how route resolution and dispacch work using endpoint routing should still apply.
 
