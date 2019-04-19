@@ -125,7 +125,7 @@ Once the route is matched by `UseEndpointRouteResolverMiddleware` an Endpoint ob
 
 In version 3 preview 3 version of this pseudo code, the route mapping is passed to `UseEndpointRouteResolverMiddleware` and there does not exist a `UseEndpointDispatcherMiddleware` at the end of the pipeline. This is because the ASP.NET framework itself will implicitly dispatch the resolved endpoint at the end of the request pipeline.
 
-So in version 3 preview 3 the code has the form below:
+So the pseudocode representing version 3 preview 3 has the form below:
 
 ```csharp
 public void Configure(IApplicationBuilder app
@@ -138,7 +138,6 @@ public void Configure(IApplicationBuilder app
         routes.MapControllers();
     })
 
-
     app.UseAfterEndpointResolutionMiddleware()
 
     // The resolved endpoint is implicitly dispatched here at the end of the pipeline
@@ -146,7 +145,7 @@ public void Configure(IApplicationBuilder app
 }
 ```
 
-This looks like to be changing with the 3.0 release version, as the current source code shows that the `UseEndpointDispatcherMiddleware` is added back in and it is the middleware that takes the route mappings as a parameter as illustrated by the second version of the pseudocode above.
+This looks to be changing with the 3.0 release version, as the current source code shows that the `UseEndpointDispatcherMiddleware` is added back in and it is the middleware that takes the route mappings as a parameter as illustrated by the second version of the pseudocode above.
 
 ### Endpoint routing in version 2.2
 
@@ -190,7 +189,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     //added endpoint routing
     app.UseEndpointRouting();
 
-    //middleware belwo will have access to the Endpoint
+    //middleware below will have access to the Endpoint
 
     app.UseHttpsRedirection();
 
@@ -210,7 +209,50 @@ In version 2.2 the MVC middleware at the end of the pipeline acts as the endpoin
 
 The endpoint resolution middleware uses the route mappings configured by the MVC middleware.
 
-### Endpoint routing in V3 preview
+Once we have enabled endpoint routing we can actually inspect the resolved endpoint object if we add our own custom middleware show below:
+
+```csharp
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Routing;
+
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    if (env.IsDevelopment())
+        app.UseDeveloperExceptionPage();
+    else
+        app.UseHsts();
+
+    app.UseEndpointRouting();
+
+    app.UseHttpsRedirection();
+
+    //our custom middlware
+    app.Use((context, next) =>
+    {
+        var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
+        var endpoint = endpointFeature?.Endpoint;
+
+        //note: endpoint will be null, if there was no resolved route
+        if (endpoint != null)
+        {
+            var routePattern = (endpoint as RouteEndpoint)?.RoutePattern
+                                                          ?.RawText;
+
+            Console.WriteLine("Name: " + endpoint.DisplayName);
+            Console.WriteLine($"Route Pattern: {routePattern}");
+            Console.WriteLine("Metadata Types: " + string.Join(", ", endpoint.Metadata));
+        }
+        return next();
+    });
+
+    app.UseMvc();
+}
+```
+
+As you can see we can inspect and print out the endpoint object that the endpoint routing resolution middleware
+`UseEndpointRouting` has resolved. The endpoint object will be null, if the resolver was not able to match the request to a mapped route. We needed to pull in two additional namespaces to access the endpoint routing features.
+
+### Endpoint routing in Version 3 preview 3
 
 In version 3 preview 3, endpoint routing will become a full fledged citizen of ASP.NET Core and we will finally have separation between the MVC controller action dispatcher and the route resolution middleware.
 
@@ -250,6 +292,51 @@ You will also notice that there is a `app.UseAuthorization()` after `app.UseRout
 Notice that we dont have any MVC or endpoint dispatch middleware configured at the end of the method, after all other middleware configuration.
 
 This is becuase the behavior of the version 3 preview 3 build is that the resolved endpoint will be implicitly dispatched to the controller action by the framework itself.
+
+Similar to what we did for version 2.2 we can add the same custom middleware to inspect the resolved endpoint object.
+
+```csharp
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Routing;
+
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    if (env.IsDevelopment())
+        app.UseDeveloperExceptionPage();
+    else
+        app.UseHsts();
+
+    app.UseHttpsRedirection();
+
+    app.UseRouting(routes =>
+    {
+        routes.MapControllers();
+    });
+
+    app.UseAuthorization();
+
+    //our custom middlware
+    app.Use((context, next) =>
+    {
+        var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
+        var endpoint = endpointFeature?.Endpoint;
+
+        //note: endpoint will be null, if there was no resolved route
+        if (endpoint != null)
+        {
+            var routePattern = (endpoint as RouteEndpoint)?.RoutePattern
+                                                          ?.RawText;
+
+            Console.WriteLine("Name: " + endpoint.DisplayName);
+            Console.WriteLine($"Route Pattern: {routePattern}");
+            Console.WriteLine("Metadata Types: " + string.Join(", ", endpoint.Metadata));
+        }
+        return next();
+    });
+
+    //the endpoint is dispatched by default at the end of the middleware pipeline
+}
+```
 
 ### Endpoint routing in upcoming ASP.NET Core version 3.0 source code repository
 
