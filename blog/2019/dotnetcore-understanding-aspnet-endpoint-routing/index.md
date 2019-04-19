@@ -182,9 +182,6 @@ using Microsoft.AspNetCore.Internal;
 
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
-    //DefaultEndpointDataSource
-    //app.UseEndpoint();
-
     if (env.IsDevelopment())
         app.UseDeveloperExceptionPage();
     else
@@ -204,6 +201,10 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 ```
 
 Here we have added the namespace `Microsoft.AspNetCore.Internal`. Including it, enables an additional `IApplicationBuilder` extension method `UseEndpointRouting` that is the endpoint resolution middleware that resolves the route and adds the Endpoint object to the httpcontext.
+
+You can check out the source code for `UseEndpointRouting` extension method in version 2.2 at:
+
+[https://github.com/aspnet/AspNetCore/blob/v2.2.4/src/Http/Routing/src/Internal/EndpointRoutingApplicationBuilderExtensions.cs](https://github.com/aspnet/AspNetCore/blob/v2.2.4/src/Http/Routing/src/Internal/EndpointRoutingApplicationBuilderExtensions.cs)
 
 In version 2.2 the MVC middleware at the end of the pipeline acts as the endpoint dispatcher middleware. It will dispatch the resolved endpoint to the proper controller action.
 
