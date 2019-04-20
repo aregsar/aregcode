@@ -492,7 +492,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 
-public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 {
     if (env.IsDevelopment())
         app.UseDeveloperExceptionPage();
@@ -504,7 +504,14 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     app.UseRouting(routes =>
     {
         routes.MapControllers();
+
+        routes.MapGet("/secret", context =>
+        {
+            return context.Response.WriteAsync("secret");
+        }).RequireAuthorization(new AuthorizeAttribute(){ Roles = "admin" });
     });
+
+    app.UseAuthentication();
 
     //our custom middlware
     app.Use((context, next) =>
@@ -520,9 +527,6 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
             Console.WriteLine("Name: " + endpoint.DisplayName);
             Console.WriteLine($"Route Pattern: {routePattern}");
-
-            //Metadata: Microsoft.AspNetCore.Routing.HttpMethodMetadata, 
-            //Microsoft.AspNetCore.Authorization.AuthorizeAttribute
             Console.WriteLine("Metadata Types: " + string.Join(", ", endpoint.Metadata));
         }
         return next();
@@ -530,7 +534,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
     app.UseAuthorization();
 
-    //the endpoint is dispatched by default at the end of the middleware pipeline
+    //the framework implicitly dispaches the endpoint here.
 }
 ```
 
