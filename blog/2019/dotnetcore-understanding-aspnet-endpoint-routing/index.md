@@ -484,6 +484,60 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
 You can see that I am using the `RequireAuthorization` method to add an `AuthorizeAttribute` attribute to the `/secret` route. This route will then only be authorized to be dispactched for a user in the admin role, by the authorization middleware, that comes before the endpoint dispatch occurs.
 
+As I showed for version 3.3 preview 3 that we can add middleware to inspect the resolved endpoint object in httpcontext so can we here to inspect the AuthorizeAttribute added to the endpoint metatdata:
+
+```csharp
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    if (env.IsDevelopment())
+        app.UseDeveloperExceptionPage();
+    else
+        app.UseHsts();
+
+    app.UseHttpsRedirection();
+
+    app.UseRouting(routes =>
+    {
+        routes.MapControllers();
+    });
+
+    //our custom middlware
+    app.Use((context, next) =>
+    {
+        var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
+        var endpoint = endpointFeature?.Endpoint;
+
+        //note: endpoint will be null, if there was no resolved route
+        if (endpoint != null)
+        {
+            var routePattern = (endpoint as RouteEndpoint)?.RoutePattern
+                                                          ?.RawText;
+
+            Console.WriteLine("Name: " + endpoint.DisplayName);
+            Console.WriteLine($"Route Pattern: {routePattern}");
+
+            //Metadata: Microsoft.AspNetCore.Routing.HttpMethodMetadata, 
+            //Microsoft.AspNetCore.Authorization.AuthorizeAttribute
+            Console.WriteLine("Metadata Types: " + string.Join(", ", endpoint.Metadata));
+        }
+        return next();
+    });
+
+    app.UseAuthorization();
+
+    //the endpoint is dispatched by default at the end of the middleware pipeline
+}
+```
+
+This time I have added the custom middleware before the Authorization middleware and pulled in two additional namespaces.
+
+Navigating to the `/secret` route and inspecting the metadata, you can see that it contains the `Microsoft.AspNetCore.Authorization.AuthorizeAttribute` type in addition to the `Microsoft.AspNetCore.Routing.HttpMethodMetadata` type.
+
 ## References used for this article
 
 The following articles contain source material that I used as a reference for this article:
