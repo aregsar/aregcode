@@ -6,21 +6,21 @@ April 11, 2019 by [Areg Sarkissian](https://aregcode.com/about)
 
 In this post I will explain the new Endpoint Routing feature that has been added to the ASP.NET Core middleware pipeline starting with version 2.2 and how it is evolving through to the upcoming version 3.0 that is at preview 3 at present time.
 
-## The motivation behine endpoint routing
+## The motivation behind endpoint routing
 
-Prior to endpoint routing the routing reslotion for an ASP.NET Core application was done in the ASP.NET Core MVC middleware at the end of the HTTP request processing pipeline. This meant that route information, such as what controller action would be executed, was not available to middleware that processed the request before the MVC middleware in the middleware pipeline.
+Prior to endpoint routing the routing resolution for an ASP.NET Core application was done in the ASP.NET Core MVC middleware at the end of the HTTP request processing pipeline. This meant that route information, such as what controller action would be executed, was not available to middleware that processed the request before the MVC middleware in the middleware pipeline.
 
-It is particularly usefull to have this route information available for example in a CORS or authorization middleware to use the information as a factor in the authorization process.
+It is particularly useful to have this route information available for example in a CORS or authorization middleware to use the information as a factor in the authorization process.
 
-Endpoint routing also allows us to decouple the route matching logic from the MVC middleware, moving it into its own middleware. It allows the MVC middleware to focus on its responsablity of dispatching the request to the particular controller action method that is resolved by the endpoint routing middleware.
+Endpoint routing also allows us to decouple the route matching logic from the MVC middleware, moving it into its own middleware. It allows the MVC middleware to focus on its responsibility of dispatching the request to the particular controller action method that is resolved by the endpoint routing middleware.
 
-## The new Endpoint Routing middleare
+## The new Endpoint Routing middleware
 
 Due to the above mentioned reasons, the endpoint routing feature was born to allow the route resolution to happen earlier in the pipeline in a separate endpoint routing middleware. This new middleware can be placed at any point in the pipeline after which other middleware in the pipeline can access the resolved route data.
 
 The endpoint routing middleware API is evolving with the upcoming 3.0 version of the .NET Core framework. For that reason, the API that I will describe in the following sections may not be the final version of the feature. However the over all concept and understanding of how route resolution and dispatch work using endpoint routing should still apply.
 
-In the following sections I will walk you through the current iterations of endpoint routing implementation from verion 2.2 to version 3.0 preview 3, then I will note some changes that are comming based on the the current ASP.NET Core source code.
+In the following sections I will walk you through the current iterations of endpoint routing implementation from version 2.2 to version 3.0 preview 3, then I will note some changes that are coming based on the current ASP.NET Core source code.
 
 ## The three core concepts involved in Endpoint Routing
 
@@ -34,9 +34,9 @@ These are the following:
 
 ### Endpoint route resolution
 
-The endpoint route resolution is the concept of looking at the incomming request and mapping the request to an endpoint using route mappings. An endpoint represents the controller action that the incomming request resolves to, along with other metadata attached to the route that matches the request.
+The endpoint route resolution is the concept of looking at the incoming request and mapping the request to an endpoint using route mappings. An endpoint represents the controller action that the incoming request resolves to, along with other metadata attached to the route that matches the request.
 
-The job of the route resolution middleware is to construct and __Endpoint__ object using the route information from the route that it resolves based on the route mappings. The middleware then places that object into the http context where other middleware the come after the endpoint routimg middleware in the pipeline can access the endpoint object and use the route information within.
+The job of the route resolution middleware is to construct and __Endpoint__ object using the route information from the route that it resolves based on the route mappings. The middleware then places that object into the http context where other middleware the come after the endpoint routing middleware in the pipeline can access the endpoint object and use the route information within.
 
 Prior to endpoint routing, route resolution was done in the MVC middleware at the end of the middleware pipeline. The current 2.2 version of the framework adds a new endpoint route resolution middleware that can be placed at any point in the pipeline, but keeps the endpoint dispatch in the MVC middleware. This will change in the 3.0 version where the endpoint dispatch will happen in a separate endpoint dispatch middleware that will replace the MVC middleware.
 
@@ -44,19 +44,19 @@ Prior to endpoint routing, route resolution was done in the MVC middleware at th
 
 Endpoint dispatch is the process of invoking the controller action method that corresponds to the endpoint that was resolved by the endpoint routing middleware.
 
-The endpoint dipatch middleware is the last middleware in the pipeline that grabs the endpoint object from the http context and dispatches to particular controller action that the resolved endpoint specifies.
+The endpoint dispatch middleware is the last middleware in the pipeline that grabs the endpoint object from the http context and dispatches to particular controller action that the resolved endpoint specifies.
 
-Currently in version 2.2 dispatching to the action method is done in the MVC middleware at the end of the pipline. 
+Currently in version 2.2 dispatching to the action method is done in the MVC middleware at the end of the pipeline.
 
-In the version 3.0 preview 3, the MVC middleware is removed. Instead the endpoint dispatch happens at the end of the middleware pipeline by default. Because the MVC middleware is removed, the route map configuration that is usually passed to the MVC middleware, is instead passed to the endpoint route resolution middlware.
+In the version 3.0 preview 3, the MVC middleware is removed. Instead the endpoint dispatch happens at the end of the middleware pipeline by default. Because the MVC middleware is removed, the route map configuration that is usually passed to the MVC middleware, is instead passed to the endpoint route resolution middleware.
 
-Based on the current source code, the upcoming 3.0 final release should have a new endpoint routing middleware that is placed at the end of the pipeline to make the endpoint dispatch explicit again. The route map configuration will be passed to this new middlware instead of the endpoint route resolution middleware as it is in version 3 preview 3.
+Based on the current source code, the upcoming 3.0 final release should have a new endpoint routing middleware that is placed at the end of the pipeline to make the endpoint dispatch explicit again. The route map configuration will be passed to this new middleware instead of the endpoint route resolution middleware as it is in version 3 preview 3.
 
 ### Endpoint route mapping
 
-When we define route middlware we can optionally pass in a lambda function that contains route mappings that override the default route mapping that ASP.NET Core MVC middleware extension method specifies.
+When we define route middleware we can optionally pass in a lambda function that contains route mappings that override the default route mapping that ASP.NET Core MVC middleware extension method specifies.
 
-Route mappings are used by the route resolution process to match the incomming request parameters to a route specified in the rout map.
+Route mappings are used by the route resolution process to match the incoming request parameters to a route specified in the rout map.
 
 With the new endpoint routing feature the ASP.NET Core team had to decide which middleware, the endpoint resolution or the endpoint dispatch middleware, should get the route mapping configuration lambda as a parameter.
 
@@ -73,7 +73,7 @@ Any Middleware after the endpoint route resolution middleware will be able to ac
 The following code snippet shows how this can be done in your own middleware:
 
 ```csharp
-//our custom middlware
+//our custom middleware
 app.Use((context, next) =>
 {
     var endpointFeature = context.Features[typeof(Microsoft.AspNetCore.Http.Features.IEndpointFeature)]
@@ -97,13 +97,13 @@ app.Use((context, next) =>
 ```
 
 As you can see I am accessing the resolved endpoint object through the IEndpointFeature or the Http Context.
-The framework provides wrapper methods to access the endpoint object without having to reach diretly into the context as I have shown here.
+The framework provides wrapper methods to access the endpoint object without having to reach directly into the context as I have shown here.
 
 ## Endpoint routing configuration
 
 The middleware pipeline endpoint route resolver middleware, endpoint dispatcher middleware and endpoint route mapping lambda is setup in the `Startup.Configure` method of the `Startup.cs` file of ASP.NET Core project.
 
-This configuration changed between 2.2 and 3.0 preview 3 versions and is still changing before the 3.0 release version. So in order to demonstrate the endpoint routing configuration I am going to declare the general form of the endpoint routing middleware configurartion as pseudo code based on the three core concepts listed above:
+This configuration changed between 2.2 and 3.0 preview 3 versions and is still changing before the 3.0 release version. So in order to demonstrate the endpoint routing configuration I am going to declare the general form of the endpoint routing middleware configuration as pseudo code based on the three core concepts listed above:
 
 ```csharp
 //psuedocode that passes route map to endpoint resolver middleware
@@ -126,11 +126,13 @@ public void Configure(IApplicationBuilder app
     //that can access to the endpoint object
     app.UseAfterEndpointResolutionMiddleware();
 
+    //The middleware at the end of the pipeline that dispatches the controler action method
+    //will replace the current MVC middleware
     app.UseEndpointDispatcherMiddleware();
 }
 ```
 
-This version of our pseudocode shows the route mappings lambda passed as a parameter to the `UseEndpointRouteResolverMiddleware` endpoint route resolution middleware extension method.
+This version of our pseudo code shows the route mappings lambda passed as a parameter to the `UseEndpointRouteResolverMiddleware` endpoint route resolution middleware extension method.
 
 An alternate version that matches what the current source code looks like, is shown below:
 
@@ -164,10 +166,10 @@ Once the route is matched by `UseEndpointRouteResolverMiddleware` an Endpoint ob
 
 In version 3 preview 3 version of this pseudo code, the route mapping is passed to `UseEndpointRouteResolverMiddleware` and there does not exist a `UseEndpointDispatcherMiddleware` at the end of the pipeline. This is because in this version the ASP.NET framework itself implicitly dispatches the resolved endpoint at the end of the request pipeline.
 
-So the pseudocode representing version 3 preview 3 has the form below:
+So the pseudo code representing version 3 preview 3 has the form below:
 
 ```csharp
-//psuedocode representing v3 preview 3 endpoint routing API 
+//pseudo code representing v3 preview 3 endpoint routing API 
 public void Configure(IApplicationBuilder app
                      , IHostingEnvironment env)
 {
@@ -188,7 +190,7 @@ public void Configure(IApplicationBuilder app
 }
 ```
 
-This API looks to be changing with the 3.0 release version, as the current source code shows that the `UseEndpointDispatcherMiddleware` is added back in and it is the middleware that takes the route mappings as a parameter as illustrated by the second version of the pseudocode above.
+This API looks to be changing with the 3.0 release version, as the current source code shows that the `UseEndpointDispatcherMiddleware` is added back in and it is the middleware that takes the route mappings as a parameter as illustrated by the second version of the pseudo code above.
 
 ### Endpoint routing in version 2.2
 
@@ -232,7 +234,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     app.UseEndpointRouting();
 
     //middleware below will have access to the Endpoint
-    
+
     app.UseHttpsRedirection();
 
     //the MVC middleware dispatches the controller action
@@ -317,8 +319,8 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 
     app.UseAuthorization();
 
-    //No need to have a dipatcher middleware here.
-    //The resolved endpoint is automatically dispacthed to a controller action at the end
+    //No need to have a dispatcher middleware here.
+    //The resolved endpoint is automatically dispatched to a controller action at the end
     //of the middleware pipeline
     //If an endpoint was not able to be resolved, a 404 not found is returned at the end
     //of the middleware pipeline
@@ -331,9 +333,9 @@ The `routes.MapControllers()` inside the mapping function configures the default
 
 You will also notice that there is a `app.UseAuthorization()` after `app.UseRouting()` which configures the authorization middleware. This middleware will have access the httpcontext endpoint object set by the endpoint routing middleware.
 
-Notice that we dont have any MVC or endpoint dispatch middleware configured at the end of the method, after all other middleware configuration.
+Notice that we don't have any MVC or endpoint dispatch middleware configured at the end of the method, after all other middleware configuration.
 
-This is becuase the behavior of the version 3 preview 3 build is that the resolved endpoint will be implicitly dispatched to the controller action by the framework itself.
+This is because the behavior of the version 3 preview 3 build is that the resolved endpoint will be implicitly dispatched to the controller action by the framework itself.
 
 Similar to what we did for version 2.2 we can add the same custom middleware to inspect the resolved endpoint object.
 
@@ -357,7 +359,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
     app.UseAuthorization();
 
-    //our custom middlware
+    //our custom middleware
     app.Use((context, next) =>
     {
         var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
@@ -387,7 +389,7 @@ As we approach the version 3.0 release of the framework, it looks like the team 
 
 We can see how this is changed yet again by peeking at the current source code.
 
-Here is a sinppet from the source code for the version 3.0 sample application music store at:
+Here is a snippet from the source code for the version 3.0 sample application music store at:
 
 [https://github.com/aspnet/AspNetCore/blob/master/src/MusicStore/samples/MusicStore/Startup.cs](https://github.com/aspnet/AspNetCore/blob/master/src/MusicStore/samples/MusicStore/Startup.cs)
 
@@ -429,7 +431,7 @@ public void Configure(IApplicationBuilder app)
 }
 ```
 
-As you can see that we have something similar to my pseudocode implementation that I detailed above. 
+As you can see that we have something similar to my pseudo code implementation that I detailed above. 
 
 Particularly, we still have the  `app.UseRouting()` middleware setup from the version 3 preview 3, but now we also have an explicit  `app.UseEndpoints()` endpoint dispatch method that more aptly named for what it does.
 
@@ -449,7 +451,7 @@ To use endpoint routing, we also need to add the middleware to the DI container 
 
 ### ConfigureServices in Version 2.2
 
-For version 2.2 of the framework we need to add the call to `services.AddRouting()` method shown below:
+For version 2.2 of the framework we need to explicitly add the call to `services.AddRouting()` method shown below to add the endpoint routing feature to the DI container:
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
@@ -463,7 +465,7 @@ public void ConfigureServices(IServiceCollection services)
 
 ### ConfigureServices in Version 3 preview 3
 
-For version 3 preview 3 build of the framework, endpoint routing already comes configured under the covers in the `AddMvc()` extension method:
+For version 3 preview 3 build of the framework, endpoint routing already comes configured in the DI container under the covers in the `AddMvc()` extension method:
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
@@ -475,17 +477,17 @@ public void ConfigureServices(IServiceCollection services)
 
 ## Setting up Endpoint Authorization using endpoint routing and route mappings
 
-When working with the version 3 preview 3 release we can attach autorization metadata to an endpoint. We do this using the route mappings configuration fluent API `RequireAuthorization` method.
+When working with the version 3 preview 3 release we can attach authorization metadata to an endpoint. We do this using the route mappings configuration fluent API `RequireAuthorization` method.
 
 The endpoint routing resolver will access this metadata when processing a request and add it to the Endpoint object that it sets on the httpcontext.
 
 Any middleware in the pipeline after the route resolution middleware can access this authorization data by accessing the resolved Endpoint object.
 
-In particular the authorization middleware can use this data to make authorization deciesions.
+In particular the authorization middleware can use this data to make authorization decisions.
 
 Currently the route mapping configuration parameters are passed into the endpoint route resolver middleware, but as previously mentioned, in the future releases, the route mapping configuration will be passed into the endpoint dispatcher middleware.
 
-Either way the attached authorization metadata will be availailble for the endpoint resolver middleware to use.
+Either way the attached authorization metadata will be available for the endpoint resolver middleware to use.
 
 Below is an example of the version 3 preview 3 `Startup.Configure` method where I have added a new `/secret` route
 to the endpoint resolver middleware route map configuration lambda parameter:
@@ -493,7 +495,7 @@ to the endpoint resolver middleware route map configuration lambda parameter:
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
-     if (env.IsDevelopment())
+    if (env.IsDevelopment())
         app.UseDeveloperExceptionPage();
     else
         app.UseHsts();
@@ -504,7 +506,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
         routes.MapControllers();
 
-        //Mapped route that gets attaced authorization metadata using the RequireAuthorization extension method.
+        //Mapped route that gets attached authorization metadata using the RequireAuthorization extension method.
         //This metadata will be added to the resolved endpoint for this route by the endpoint resolver
         //The app.UseAuthorization() middleware later in the pipeline will get the resolved endpoint
         //for the /secret route and use the authorization metadata attached to the endpoint
@@ -521,13 +523,13 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     //the "/secret" route, then it will authorize the route, if it the user is in the admin role
     app.UseAuthorization();
 
-    //the framework implicitly dispaches the endpoint here.
+    //the framework implicitly dispatches the endpoint at the end of the pipeline.
 }
 ```
 
-You can see that I am using the `RequireAuthorization` method to add an `AuthorizeAttribute` attribute to the `/secret` route. This route will then only be authorized to be dispactched for a user in the admin role, by the authorization middleware, that comes before the endpoint dispatch occurs.
+You can see that I am using the `RequireAuthorization` method to add an `AuthorizeAttribute` attribute to the `/secret` route. This route will then only be authorized to be dispatched for a user in the admin role, by the authorization middleware, that comes before the endpoint dispatch occurs.
 
-As I showed for version 3.3 preview 3 that we can add middleware to inspect the resolved endpoint object in httpcontext so can we here to inspect the AuthorizeAttribute added to the endpoint metatdata:
+As I showed for version 3.3 preview 3 that we can add middleware to inspect the resolved endpoint object in httpcontext so can we here to inspect the AuthorizeAttribute added to the endpoint metadata:
 
 ```csharp
 using Microsoft.AspNetCore.Http.Features;
@@ -556,7 +558,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 
     app.UseAuthentication();
 
-    //our custom middlware
+    //our custom middleware
     app.Use((context, next) =>
     {
         var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
@@ -578,7 +580,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 
     app.UseAuthorization();
 
-    //the framework implicitly dispaches the endpoint here.
+    //the framework implicitly dispatches the endpoint here.
 }
 ```
 
