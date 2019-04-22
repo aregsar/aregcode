@@ -68,7 +68,7 @@ Its important to note that the endpoint resolution happens during runtime reques
 
 ## Accessing the resolved endpoint
 
-Any Middleware after the endpoint route resolution middleware will be able to access the resolved endpoint through the http context.
+Any Middleware after the endpoint route resolution middleware will be able to access the resolved endpoint through the HttpContext.
 
 The following code snippet shows how this can be done in your own middleware:
 
@@ -77,13 +77,15 @@ The following code snippet shows how this can be done in your own middleware:
 app.Use((context, next) =>
 {
     var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
-    var endpoint = endpointFeature?.Endpoint;
 
-    //note: endpoint will be null, if there was no resolved route
+    Microsoft.AspNetCore.Http.Endpoint endpoint = endpointFeature?.Endpoint;
+
+    //Note: endpoint will be null, if there was no
+    //route match found for the request by the endpoint route resolver middleware
     if (endpoint != null)
     {
-        var routePattern = (endpoint as RouteEndpoint)?.RoutePattern
-                                                        ?.RawText;
+        var routePattern = (endpoint as Microsoft.AspNetCore.Routing.RouteEndpoint)?.RoutePattern
+                                                                                   ?.RawText;
 
         Console.WriteLine("Name: " + endpoint.DisplayName);
         Console.WriteLine($"Route Pattern: {routePattern}");
@@ -93,11 +95,14 @@ app.Use((context, next) =>
 });
 ```
 
-As you can see I am accessing the
+As you can see I am accessing the resolved endpoint object through the IEndpointFeature or the Http Context.
+The framework provides wrapper methods to access the endpoint object without having to reach diretly into the context as I have shown here.
 
 ## Endpoint routing configuration
 
-The middleware pipeline endpoint route resolver middleware, endpoint dispatcher middleware and endpoint route mapping lambda is setup in the `Startup.Configure` method of the `Startup.cs` file of ASP.NET Core project. This configuration changed between 2.2 and 3.0 preview 3 versions and is still changing before the 3.0 release version.
+The middleware pipeline endpoint route resolver middleware, endpoint dispatcher middleware and endpoint route mapping lambda is setup in the `Startup.Configure` method of the `Startup.cs` file of ASP.NET Core project. 
+
+This configuration changed between 2.2 and 3.0 preview 3 versions and is still changing before the 3.0 release version.
 
 So in order to demonstrate the endpoint routing configuration I am going to declare the general form of the endpoint routing middleware configurartion as pseudo code based on the three core concepts listed above:
 
@@ -349,7 +354,8 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
         var endpoint = endpointFeature?.Endpoint;
 
-        //note: endpoint will be null, if there was no resolved route
+        //note: endpoint will be null, if there was no
+        //route match found for the request by the endpoint route resolver middleware
         if (endpoint != null)
         {
             var routePattern = (endpoint as RouteEndpoint)?.RoutePattern
@@ -547,7 +553,8 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
         var endpoint = endpointFeature?.Endpoint;
 
-        //note: endpoint will be null, if there was no resolved route
+        //note: endpoint will be null, if there was no
+        //route match found for the request by the endpoint route resolver middleware
         if (endpoint != null)
         {
             var routePattern = (endpoint as RouteEndpoint)?.RoutePattern
