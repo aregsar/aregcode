@@ -6,9 +6,7 @@ In the past I have developed mission critical software for organizations as dive
 
 I helped these organizations design robust, testable and maintainable application code and mentored development teams on enterprise software development best practices.
 
-I strive to use immutable, composable, stateless and side effect free code to make code easy to reason about and make code easy to test and debug.
-
-I optimize my code for readablity by using vertical and symetrical code organization, reducing loops, conditionals, branching and deep nesting and writing self documenting code.  
+I strive to pragmatically use immutable, composable, stateless and side effect free code to make code easy to reason about and make code easy to test and debug.
 
 I am a proponent of the following that help efficiently deliver reliable code:
 
@@ -28,7 +26,7 @@ I am a proponent of the following that help efficiently deliver reliable code:
 
 Currently I am working on command line tooling to improve the developer experience of infrastructure provisioning and application deployment on the Digital Ocean platform.
 
-I am also working on __Docker__ based tooling to improve the  development experience for web developers.
+I am also working on __Docker__ based tooling and code scaffolding tools to improve the development experience for web developers.
 
 ## My Career Chronology
 
