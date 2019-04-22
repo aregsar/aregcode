@@ -76,7 +76,8 @@ The following code snippet shows how this can be done in your own middleware:
 //our custom middlware
 app.Use((context, next) =>
 {
-    var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
+    var endpointFeature = context.Features[typeof(Microsoft.AspNetCore.Http.Features.IEndpointFeature)]
+                                           as Microsoft.AspNetCore.Http.Features.IEndpointFeature;
 
     Microsoft.AspNetCore.Http.Endpoint endpoint = endpointFeature?.Endpoint;
 
