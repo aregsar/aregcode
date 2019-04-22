@@ -2,7 +2,7 @@
 
 Apr 19, 2019
 
-[Understanding .NET Core Endpoint Routing](https://aregcode.com/blog/2019/dotnetcore-understanding-aspnet-endpoint-routing)
+[Understanding ASP.NET Core Endpoint Routing](https://aregcode.com/blog/2019/dotnetcore-understanding-aspnet-endpoint-routing)
 
 Apr 16, 2019
 
