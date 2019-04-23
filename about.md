@@ -8,7 +8,7 @@ I helped these organizations design robust, testable and maintainable applicatio
 
 I strive to pragmatically use immutable, composable, stateless and side effect free code to make code easy to reason about and make code easy to test and debug.
 
-I am a proponent of the following that help efficiently deliver reliable code:
+I am a proponent of the following concepts that help efficiently deliver reliable code:
 
 + Kanban
 + WIP limits
@@ -22,7 +22,7 @@ I am a proponent of the following that help efficiently deliver reliable code:
 + Functional testing
 + Command Query Separation
 + One way data binding
-+ Redux
++ Redux data flow
 
 Currently I am working on command line tooling to improve the developer experience of infrastructure provisioning and application deployment on the Digital Ocean platform.
 
