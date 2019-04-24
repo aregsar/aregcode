@@ -2,6 +2,8 @@
 
 April 19, 2019 by [Areg Sarkissian](https://aregcode.com/about)
 
+last update April 24, 2019
+
 ## Introduction
 
 In this post I will explain the new Endpoint Routing feature that has been added to the ASP.NET Core middleware pipeline starting with version 2.2 and how it is evolving through to the upcoming version 3.0 that is at preview 3 at present time.
@@ -598,7 +600,7 @@ The following articles contain source material that I used as a reference for th
 
 ## Update for vesrion 3 preview 4
 
-Around the time I published this article, ASP.NET Core 3.0 preview 4 was released. It adds the changes that I described in the latest source code as can be seen in the code snipper from `Startup.cs` file below when creating a new webapi project:
+Around the time I published this article, ASP.NET Core 3.0 preview 4 was released. It adds the changes that I described in the latest source code as can be seen in the code snippet from `Startup.cs` file below when creating a new webapi project:
 
 ```csharp
 //code from Startup.cs file in a webapi project template
