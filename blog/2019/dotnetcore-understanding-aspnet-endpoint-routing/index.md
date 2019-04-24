@@ -596,6 +596,53 @@ The following articles contain source material that I used as a reference for th
 
 [https://www.stevejgordon.co.uk/asp-net-core-first-look-at-global-routing-dispatcher](https://www.stevejgordon.co.uk/asp-net-core-first-look-at-global-routing-dispatcher)
 
+## Update for vesrion 3 preview 4
+
+Around the time I published this article, ASP.NET Core 3.0 preview 4 was released. It adds the changes that I described in the latest source code as can be seen in the code snipper from `Startup.cs` file below when creating a new webapi project:
+
+```csharp
+//code from Startup.cs file in a webapi project template
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddControllers()
+            .AddNewtonsoftJson();
+}
+
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    if (env.IsDevelopment())
+        app.UseDeveloperExceptionPage();
+    else
+        app.UseHsts();
+
+    app.UseHttpsRedirection();
+
+    //add endpoint resolution middlware
+    app.UseRouting();
+
+    app.UseAuthorization();
+
+    //add endpoint dispatch middleware
+    app.UseEndpoints(endpoints =>
+    {
+        //route map configuration
+        endpoints.MapControllers();
+
+        //route map I added to show Authorization setup
+        endpoints.MapGet("/secret", context =>
+        {
+            return context.Response.WriteAsync("secret");
+        }).RequireAuthorization(new AuthorizeAttribute(){ Roles = "admin" });  
+    });
+}
+```
+
+As you can see this version adds the explicit `UseEndpoints` middleware extension method at the end of the pipeline that adds the endpoint dispatch middleware. Also the route configuration parameter has been moved from the `UseRouting` method in preview 3 to the `UseEndpoints` in preview 4.  
+
 ## Conclusion
 
 Endpoint routing allows ASP.NET Core applications to determine the endpoint that will be dispatched, early on in the middleware pipeline, so that later middleware can use that information to provide features not possible with the current pipeline configuration.
