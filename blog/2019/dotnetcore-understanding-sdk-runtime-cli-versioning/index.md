@@ -2,6 +2,8 @@
 
 April 15, 2019 by [Areg Sarkissian](https://aregcode.com/about)
 
+Last update Aprit 26, 2019
+
 ## Introduction
 
 In this post I will detail how to install the .NET Core framework and how the SDK and Runtime versions are specified for projects using the __CLI__ and the `global.json` and `.csproj` files.
@@ -210,6 +212,23 @@ I have two general recommendations regarding the usage of global.json with any .
 + Always add a global.json file to your projects to lock the SDK version used by the CLI. This will allow every project to use its own .NET Core version regardless of the default installed SDK version or the versions used in other projects.
 
 + Always create a global.json file before using the CLI to generate a new project. This way, the project scaffolding will use the .NET Core version specified in global.json when creating the initial project files.
+
+Here is a sample bash function to automate the process of creating a web api project pinned to specific version of the framework:
+
+```bash
+function dnapi {
+    if [ $# -eq 2 ]
+    then
+        mkdir $1 && cd $1
+        dotnet new globaljson --sdk-version $2
+        dotnet new webapi
+    fi
+}
+```
+
+If we add this to our shell profile we can create a new web api project for .NET Core version 3 preview 3 by typing `dnapi myproj 3.0.100-preview3-010431`.
+
+This will create a new folder named myproj, move into it, add a global.json file with version 3.0.100-preview3-010431 of the framework and then create a new web api project in the directory.
 
 ## Extending the .Net Core CLI by installing .Net Core Global tools
 
