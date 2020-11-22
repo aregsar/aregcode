@@ -132,7 +132,7 @@ Finished
 
 The `Omnisharp` package will automatically run `dotnet build` which will generate the `bin` directory that contains project binaries. `dotnet build` also runs `dotnet restore` which will try to install any packages in the `csproj` file if any.
 
-The package will then pop up `Required assets to build and debug are missing from 'blogapp'. Add them?` notification.
+The package will then pop up `Required assets to build and debug are missing from 'blogapp'. Add them?` notification. This happens every time you open a new project in VSCode where the project does not contain the required `.vscode` directory files.
 
 Clicking the `yes` button will add the `.vscode` directory which contains the `launch.json` launch settings file for running and debugging the application from the VSCode GUI and the `tasks.json` tasks settings file for running build tasks from VSCode GUI.
 
@@ -191,6 +191,72 @@ The response should still be:
 Hello World!
 ```
 
+Now lets refactor to show top level functions
+
+```cs
+using System;
+
+Print("Hello World!");
+
+void Print(string outputText) =>
+    Console.WriteLine(outputText);
+```
+
+Here I have added a Print function then called it with the Print statement above it.
+
+Run the program and the see the output is unchanged.
+
+How about adding command line arguments to our program to change the output text or print multiple text lines?
+
+```cs
+using System;
+
+Print("Hello World!");
+
+foreach (var arg in args)
+    Print(arg);
+
+void Print(string outputText) =>
+    Console.WriteLine(outputText);
+```
+
+Now we can pass zero or more arguments to this program. Try these out
+
+```bash
+#no arguments
+dotnet run
+#one argument
+dotnet run -- one
+#two arguments
+dotnet run -- one two
+```
+
+Finally lets also make this interactive to print more lines
+
+```cs
+using System;
+
+Print("Hello World!");
+
+foreach (var arg in args)
+    Print(arg);
+
+Console.WriteLine("Type text to print or hit enter to exit");
+
+while (true)
+{
+    var lineText = Console.ReadLine();
+
+    if (lineText?.Length == 0)
+        break;
+
+    Print(lineText);
+}
+
+void Print(string outputText) =>
+    Console.WriteLine(outputText);
+```
+
 ## Installing Entity Framework 5
 
 One last thing we may want to install is the Entity Framework command line tooling.
@@ -223,3 +289,42 @@ You should see the response
 Entity Framework Core .NET Command-line Tools
 5.0.0
 ```
+
+## One more thing
+
+I like to create a new Github repository anytime I create a new project so I can keep track of my changes from day one.
+
+I prefer the Github command line tool to create my remote repository and then use standard Git command line to create my local tracking repository.
+
+You can install Github command line tool using Homebrew
+
+```bash
+brew install gh
+```
+
+Macs come with a preinstalled version of the Git client but I like to install and manage mine through brew
+
+```bash
+brew install git
+```
+
+Create the remote repository on Github
+
+> You need to setup ssh keys for connecting to Github prior to using the tool.
+
+```bash
+gh
+```
+
+Create the repository
+
+```bash
+cd blogapp
+git init
+git add remote "myremoterepo"
+git add -A
+git commit -am "created new project"
+git push -m origin master
+```
+
+And with that we are done!
