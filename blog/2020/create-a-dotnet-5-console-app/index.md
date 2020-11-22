@@ -76,8 +76,8 @@ Should display the SDK version
 2- Create a git ignore file
 
 ```bash
-dotnet new .gitignore
-cat .gitignore
+dotnet new gitignore
+cat gitignore
 ```
 
 > To see all available `dotnet new` templates run `dotnet new -l`
@@ -108,7 +108,7 @@ Open the project in VSCode
 code .
 ```
 
-The first time we open a .NET project in VSCode, it will automatically start downloading and installing the editor packages it needs for intellisense, building and debugging .NET applications
+The first time we open a .NET project in VSCode, it will automatically start downloading and installing the editor extension packages it needs for IntelliSense, building and debugging .NET applications. You can find the code for OmniSharp at https://github.com/OmniSharp/omnisharp-vscode
 
 ```bash
 Installing C# dependencies...
@@ -130,19 +130,96 @@ Installing package 'Razor Language Server (macOS / x64)'
 Finished
 ```
 
-The installed `Omnisharp` package will automatically run `dotnet build` which will generate the `bin` directory with project binaries.
+The `Omnisharp` package will automatically run `dotnet build` which will generate the `bin` directory that contains project binaries. `dotnet build` also runs `dotnet restore` which will try to install any packages in the `csproj` file if any.
 
-The package will then pop up `required assets to build and run the application are missing, install?` notification.
+The package will then pop up `Required assets to build and debug are missing from 'blogapp'. Add them?` notification.
 
-Clicking the `yes` button makes will add the `.vscode` directory contains the `launch.json` launch settings file for running and debugging the application from the VSCode GUI and the `tasks.json` tasks settings file for running build tasks from VSCode GUI
+Clicking the `yes` button will add the `.vscode` directory which contains the `launch.json` launch settings file for running and debugging the application from the VSCode GUI and the `tasks.json` tasks settings file for running build tasks from VSCode GUI.
 
-/Users/aregsarkissian/.nuget/packages/
-/Users/aregsarkissian/.nuget/NuGet/NuGet.Config
+## Running the program from the command line
 
----
+```bash
+dotnet run
+```
 
+> dotnet run will run dotnet build which will in turn run dotnet restore, so there is no need to run each command individually
+
+The response should be:
+
+```bash
+Hello World!
+```
+
+## Modifying the code
+
+Just as an example I will show you how to use the C# 9 top level statements to eliminate the boilerplate in the program.cs file
+
+OPen program.cs in your editor and you should see
+
+```cs
+using System;
+
+namespace blogapp
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+        }
+    }
+}
+```
+
+We can remove much of this boilerplate
+
+```cs
+using System;
+
+Console.WriteLine("Hello World!");
+```
+
+Run the program again
+
+```bash
+dotnet run
+```
+
+The response should still be:
+
+```bash
+Hello World!
+```
+
+## Installing Entity Framework 5
+
+One last thing we may want to install is the Entity Framework command line tooling.
+
+This will give us an opportunity to see how dotnet tools can be installed to add more command line capabilities.
+
+Install the EF Core tool
+
+```bash
 dotnet tool install --global dotnet-ef --version 5.0.0
+```
 
-export PATH="\$PATH:~/.dotnet/tools"
+In order to be able to access the tools we need to add the tools directory to our system path
 
+Add the following to your shell profile file
+
+```bash
+export PATH="$PATH:~/.dotnet/tools"
+```
+
+Check the EF Core version
+
+```bash
 dotnet ef --version
+```
+
+You should see the response
+
+```bash
+Entity Framework Core .NET Command-line Tools
+5.0.0
+```
