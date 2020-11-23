@@ -324,7 +324,7 @@ Here is a tool that is a REPL for making HTTP calls to web apis
 dotnet tool install -g Microsoft.dotnet-httprepl
 ```
 
-You run this command directly without the dotnet command
+You run this command directly without the `dotnet` command
 
 ```bash
 httprepl
@@ -339,22 +339,23 @@ cd blogapp
 dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true --self-contained true
 ```
 
-This command will produce the following executable relative to your project directory
+This command will produce the following executable relative to your project directory.
 
 ```bash
 bin/Release/net5.0/osx-x64/publish/blogapp
 ```
 
-The -c flag specifies a Release version of the app and the -r flag specifies the target platform
+The -c flag specifies a Release version of the app and the -r flag specifies the target platform.
 
 Execute the program
 
 ```bash
-cd bin/Release/net5.0/osx-x64/publish
-./blogapp
+cd bin/Release/net5.0/osx-x64/publish/blogapp
 ```
 
 You should see the app running
+
+> If you change the publish command to use `--self-contained false` the executable will require the the .NET Framework SDK to be present on the users machine to be able to run the single file executable.
 
 ## One more thing
 
