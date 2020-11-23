@@ -4,7 +4,7 @@
 
 ## .NET 5 installation on Mac
 
-1-Download and install .NET 5 SDK.
+1-Download and install .NET 5 SDK from [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
 
 2-Check the version of the .NET CLI in installation directory
 
@@ -171,7 +171,7 @@ namespace blogapp
 }
 ```
 
-We can remove much of this boilerplate
+We can remove much of this boilerplate using the C# 9 top level statements feature
 
 ```cs
 using System;
@@ -191,7 +191,7 @@ The response should still be:
 Hello World!
 ```
 
-Now lets refactor to show top level functions
+Now lets refactor to add top level functions
 
 ```cs
 using System;
@@ -202,9 +202,11 @@ void Print(string outputText) =>
     Console.WriteLine(outputText);
 ```
 
-Here I have added a Print function then called it with the Print statement above it.
+Here I have added a Print function which is called with the Print statement above it.
 
 Run the program and the see the output is unchanged.
+
+You can also add top level classes to the file and then instantiate and call class methods in the top level statements.
 
 How about adding command line arguments to our program to change the output text or print multiple text lines?
 
@@ -298,7 +300,25 @@ Entity Framework Core .NET Command-line Tools
 5.0.0
 ```
 
+If you check `~/.dotnet/tools/` directory you should see the `dotnet-ef` binary file.
+
+To uninstall a global tool we can run the `dotnet tool uninstall` command with the same tool name.
+
+## Installing other useful tools
+
 Other tool can be added using the same dotnet tool install command
+
+Here is a tool that is a REPL for making HTTP calls to web apis
+
+```bash
+dotnet tool install -g Microsoft.dotnet-httprepl
+```
+
+Run this command directly without the dotnet command
+
+```bash
+httprepl
+```
 
 ## One more thing
 
