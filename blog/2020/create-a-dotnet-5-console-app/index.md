@@ -247,7 +247,7 @@ while (true)
 {
     var lineText = Console.ReadLine();
 
-    if (lineText?.Length == 0)
+    if (lineText.Length == 0)
         break;
 
     Print(lineText);
@@ -257,9 +257,17 @@ void Print(string outputText) =>
     Console.WriteLine(outputText);
 ```
 
+Run the code again.
+
+After it prints its output it waits for user input.
+
+Typing any text and hitting the enter key, echos the text to the output.
+
+Hitting enter key alone will exit the program.
+
 ## Installing Entity Framework 5
 
-One last thing we may want to install is the Entity Framework command line tooling.
+One Other thing we may want to do is install is the Entity Framework command line tooling.
 
 This will give us an opportunity to see how dotnet tools can be installed to add more command line capabilities.
 
@@ -289,6 +297,8 @@ You should see the response
 Entity Framework Core .NET Command-line Tools
 5.0.0
 ```
+
+Other tool can be added using the same dotnet tool install command
 
 ## One more thing
 
