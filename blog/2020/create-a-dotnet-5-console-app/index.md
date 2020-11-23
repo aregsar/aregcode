@@ -267,6 +267,16 @@ Typing any text and hitting the enter key, echos the text to the output.
 
 Hitting enter key alone will exit the program.
 
+## Debugging using VSCode
+
+To run this program using the VSCode debugger, use the `cmd+shift+d` keyboard shortcut to open the debugger panel and start the debugger.
+
+Before you start the debugger, replace the `"console": "internalConsole"` setting in the `"name": ".NET Core Launch (console)"` configuration section in the `.vscode/launch.json` file to `"console": "integratedTerminal"`.
+
+This will allow the `Console.ReadLine()` line in the program to except input from the VSCode integrated terminal.
+
+Another option is to use the `"console": "externalTerminal"`, This will launch an external MacOS terminal when you start debugging, instead of using the integrated terminal.
+
 ## Installing Entity Framework 5
 
 One Other thing we may want to do is install is the Entity Framework command line tooling.
@@ -306,7 +316,7 @@ To uninstall a global tool we can run the `dotnet tool uninstall` command with t
 
 ## Installing other useful tools
 
-Other tool can be added using the same dotnet tool install command
+Other tools can be added using the same `dotnet tool install` command
 
 Here is a tool that is a REPL for making HTTP calls to web apis
 
@@ -314,11 +324,37 @@ Here is a tool that is a REPL for making HTTP calls to web apis
 dotnet tool install -g Microsoft.dotnet-httprepl
 ```
 
-Run this command directly without the dotnet command
+You run this command directly without the dotnet command
 
 ```bash
 httprepl
 ```
+
+## Building a self contained executable
+
+Create a single file self contained executable
+
+```bash
+cd blogapp
+dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true --self-contained true
+```
+
+This command will produce the following executable relative to your project directory
+
+```bash
+bin/Release/net5.0/osx-x64/publish/blogapp
+```
+
+The -c flag specifies a Release version of the app and the -r flag specifies the target platform
+
+Execute the program
+
+```bash
+cd bin/Release/net5.0/osx-x64/publish
+./blogapp
+```
+
+You should see the app running
 
 ## One more thing
 
