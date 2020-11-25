@@ -430,7 +430,7 @@ Now that the client is authenticated, Create the repository
 
 ```bash
 cd blogapp
-#we need to initialize a git repository before using the gh client repo create command
+#need to initialize a git repository before using the gh client 'repo create' command so the command can add the remote
 git init
 # create a public repo (use --private instead to make the repo private)
 # the command will add the remote repo to our remotes so we wont need to add it manually like we normally need to do when using the git client
