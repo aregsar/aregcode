@@ -330,68 +330,119 @@ You run this command directly without the `dotnet` command
 httprepl
 ```
 
+List all installed tools.
+
+```bash
+dotnet tool list --global
+```
+
+The output lists the two tools we have installed so far.
+
+```bash
+Package Id                     Version      Commands
+-----------------------------------------------------
+dotnet-ef                      5.0.0        dotnet-ef
+microsoft.dotnet-httprepl      5.0.0        httprepl
+```
+
 ## Building a self contained executable
 
 Create a single file self contained executable
 
 ```bash
 cd blogapp
-dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true --self-contained true
+dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+
 ```
 
-This command will produce the following executable relative to your project directory.
+The -c flag specifies a Release version of the app and the -r flag specifies the target platform.
+
+The command will produce the following files relative to your project directory.
+
+```bash
+#binary executable
+bin/Release/net5.0/osx-x64/publish/blogapp
+#symbol file
+bin/Release/net5.0/osx-x64/publish/blogapp.pdb
+```
+
+Execute the program
 
 ```bash
 bin/Release/net5.0/osx-x64/publish/blogapp
 ```
 
-The -c flag specifies a Release version of the app and the -r flag specifies the target platform.
-
-Execute the program
-
-```bash
-cd bin/Release/net5.0/osx-x64/publish/blogapp
-```
-
 You should see the app running
 
-> If you change the publish command to use `--self-contained false` the executable will require the the .NET Framework SDK to be present on the users machine to be able to run the single file executable.
+> Note we could have used `IncludeAllContentForSelfExtract` instead of `IncludeNativeLibrariesForSelfExtract` to make a the resulting executable extract files to disk as was done in .NET 3.1. However in .NET 5 we have the IncludeNativeLibrariesForSelfExtract option which will only extract some native libraries to the disk and load the rest of the program directly into memory.
 
-## One more thing
+## One More Thing
 
 I like to create a new Github repository anytime I create a new project so I can keep track of my changes from day one.
 
-I prefer the Github command line tool to create my remote repository and then use standard Git command line to create my local tracking repository.
+I prefer the Github command line client to create my remote repository and then use standard Git command line client to create my local tracking repository.
 
-You can install Github command line tool using Homebrew
+You can install Github command line tool using Homebrew.
 
 ```bash
 brew install gh
+gh --version
 ```
 
-Macs come with a preinstalled version of the Git client but I like to install and manage mine through brew
+The manual for `gh` is located at [https://cli.github.com/manual](https://cli.github.com/manual)
+
+Macs come with a preinstalled version of the Git client. If you don't want to use your native MacOS git client you can install git using brew as well
 
 ```bash
 brew install git
+git --version
 ```
 
-Create the remote repository on Github
-
-> You need to setup ssh keys for connecting to Github prior to using the tool.
+Configure the gh client and the remote repo to use the ssh protocol. By default they both use the http protocol.
 
 ```bash
-gh
+#set local git client protocol
+gh config set git_protocol ssh
+#set remote git repo protocol
+gh config set -h github.com git_protocol ssh
+#check local setting
+gh config get git_protocol
+#check remote setting
+gh config get -h github.com git_protocol
 ```
 
-Create the repository
+Instructions for generating SSH keys and uploading them to Github.com is located at ???
+
+Before using the `gh` client we need to authenticate with the Github
+
+```bash
+#login to github using the web browser
+gh auth login -h github.com --web
+```
+
+This command will print a verification code that you need to copy then paste in the browser window that it will launch to authenticate with Github.
+
+> Tip: After you copy the code put your cursor in the leftmost edit box on the web page and paste to paste in all entire code in one shot across all the edit boxes.
+
+### Create the remote repository on Github
+
+Now that the client is authenticated, Create the repository
 
 ```bash
 cd blogapp
+#we need to initialize a git repository before using the gh client repo create command
 git init
-git add remote "myremoterepo"
+# create a public repo (use --private instead to make the repo private)
+# the command will add the remote repo to our remotes so we wont need to add it manually like we normally need to do when using the git client
+gh repo create blogapp -d "A Blog" --public
+# track all files in the directory
 git add -A
-git commit -am "created new project"
-git push -m origin master
+# the first commit
+git commit -am "first commit"
+# create a remote repo tracking branch and push changes to remote
+git push -u origin master
+# inspect the new repository in the web browser
+gh repo view --web
 ```
 
 And with that we are done!
