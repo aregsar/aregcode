@@ -1,47 +1,54 @@
 # Create a .NET 5 Console App
 
+December 10
+
 [Create a .NET 5 Console App](https://aregcode.com/blog/2020/create-a-dotnet-5-console-app)
+
+December 10, 2020
+
+In this post I will show how to create a basic .NET 5 console application project using the `dotnet` command line interface and demonstrate a few new C# 9 features in the process.
 
 ## .NET 5 installation on Mac
 
-1-Download and install .NET 5 SDK from [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
+Download and install .NET 5 SDK from [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
 
-2-Check the version of the .NET CLI in installation directory
+Check the version of the `dotnet` executable in installation directory:
 
 ```bash
 cd /usr/local/share/dotnet
 ./dotnet --version
 ```
 
-Should display the SDK version
+Should see the displayed .NET SDK version:
 5.0.100
 
-3-Create a symlink to the .NET CLI installation directory to the global executables directory on the system path
+Create a symlink to the `dotnet` executable in the binaries directory that is on the system path:
 
 ```bash
 ln -s /usr/local/share/dotnet/dotnet /usr/local/bin/
 ```
 
-4-Check that the `dotnet` command is available globally
+Verify the `dotnet` command is available globally:
 
 ```bash
 dotnet --version
 ```
 
-Should display the SDK version
+Should see the displayed the SDK version:
+
 5.0.100
 
 ## Creating a .NET project
 
-1- Create the project directory including a global.json file for the SDK version
+Create the project directory and add a `global.json` file to specify the SDK version:
 
 ```bash
-mkdir blogapp && cd blogapp
+mkdir ConsoleApp && cd ConsoleApp
 dotnet new globaljson --sdk-version 5.0.100
 cat global.json
 ```
 
-You should see a new global.json file generated withe the following content
+You should see a new global.json file generated withe the following content:
 
 ```json
 {
@@ -51,7 +58,7 @@ You should see a new global.json file generated withe the following content
 }
 ```
 
-Open the file and add the `rollForward` strategy for future versions of the .NET framework SDK
+Open the file and add the `rollForward` strategy for rolling forward with future versions of the .NET framework SDK:
 
 ```json
 {
@@ -62,34 +69,35 @@ Open the file and add the `rollForward` strategy for future versions of the .NET
 }
 ```
 
+I chose the strategy to roll forward only with minor versions.
+
 > See details for the different rollForward strategies at https://docs.microsoft.com/en-us/dotnet/core/tools/global-json
 
-Check the project SDK version
+Verify the project SDK version again:
 
 ```bash
 dotnet --version
 ```
 
-Should display the SDK version
+Should still display the SDK version unless you have upgraded to a newer minor version of the SDK.
+
 5.0.100
 
-2- Create a git ignore file
+Create a .NET `.gitignore` file:
 
 ```bash
 dotnet new gitignore
 cat gitignore
 ```
 
-> To see all available `dotnet new` templates run `dotnet new -l`
-
-3- Create the console app
+Create the console app and print out the created project file:
 
 ```bash
 dotnet new console
-cat blogapp.csproj
+cat ConsoleApp.csproj
 ```
 
-we can see the .NET 5 framework is the target
+We can see the .NET 5 framework is the target:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -102,13 +110,17 @@ we can see the .NET 5 framework is the target
 </Project>
 ```
 
-Open the project in VSCode
+> To see all available `dotnet new` command project type templates, run `dotnet new -l`.
+
+Open the project in VSCode:
 
 ```bash
 code .
 ```
 
-The first time we open a .NET project in VSCode, it will automatically start downloading and installing the editor extension packages it needs for IntelliSense, building and debugging .NET applications. You can find the code for OmniSharp at https://github.com/OmniSharp/omnisharp-vscode
+> I have configured the my VSCode executable to launch from the command line
+
+The first time we open a .NET project in VSCode, it will automatically start downloading and installing the editor extension packages it needs for IntelliSense, building and debugging .NET applications.
 
 ```bash
 Installing C# dependencies...
@@ -130,19 +142,29 @@ Installing package 'Razor Language Server (macOS / x64)'
 Finished
 ```
 
-The `Omnisharp` package will automatically run `dotnet build` which will generate the `bin` directory that contains project binaries. `dotnet build` also runs `dotnet restore` which will try to install any packages in the `csproj` file if any.
+The installed `Omnisharp` package will automatically run `dotnet build` command which will generate the `bin` directory that contains the project binaries.
 
-The package will then pop up `Required assets to build and debug are missing from 'blogapp'. Add them?` notification. This happens every time you open a new project in VSCode where the project does not contain the required `.vscode` directory files.
+The `dotnet build` command also runs the `dotnet restore` command which will try to install any packages in the `csproj` file if it finds any.
 
-Clicking the `yes` button will add the `.vscode` directory which contains the `launch.json` launch settings file for running and debugging the application from the VSCode GUI and the `tasks.json` tasks settings file for running build tasks from VSCode GUI.
+The package will then pop up `Required assets to build and debug are missing from 'ConsoleApp'. Add them?` notification.
+
+This happens every time you open a new project in VSCode where the project does not contain the `.vscode` directory and files.
+
+Clicking the `yes` button will add the `.vscode` directory which contains the `launch.json` launch settings file for running and debugging the application from the VSCode GUI.
+
+The `.vscode` directory will also contain the `tasks.json` tasks settings file for running build tasks from VSCode GUI.
+
+> You can find the code for the OmniSharp at [https://github.com/OmniSharp/omnisharp-vscode](https://github.com/OmniSharp/omnisharp-vscode)
 
 ## Running the program from the command line
+
+We can run the code as is by using the following command:
 
 ```bash
 dotnet run
 ```
 
-> dotnet run will run dotnet build which will in turn run dotnet restore, so there is no need to run each command individually
+> the `dotnet run` command will run the `dotnet build` command which will in turn run the `dotnet restore` command, so there is no need to run each command individually.
 
 The response should be:
 
@@ -152,14 +174,14 @@ Hello World!
 
 ## Modifying the code
 
-Just as an example I will show you how to use the C# 9 top level statements to eliminate the boilerplate in the program.cs file
+The first thing I will show you is how to use the C# 9 top level statements to eliminate the boilerplate in the `program.cs` file.
 
-OPen program.cs in your editor and you should see
+Open `program.cs` in your editor:
 
 ```cs
 using System;
 
-namespace blogapp
+namespace ConsoleApp
 {
     class Program
     {
@@ -171,13 +193,15 @@ namespace blogapp
 }
 ```
 
-We can remove much of this boilerplate using the C# 9 top level statements feature
+We can remove much of this boilerplate using the C# 9 top level statements feature:
 
 ```cs
 using System;
 
 Console.WriteLine("Hello World!");
 ```
+
+Here I have removed all the boilerplate code.
 
 Run the program again
 
@@ -191,7 +215,7 @@ The response should still be:
 Hello World!
 ```
 
-Now lets refactor to add top level functions
+Now lets refactor to add top level functions:
 
 ```cs
 using System;
@@ -202,7 +226,7 @@ void Print(string outputText) =>
     Console.WriteLine(outputText);
 ```
 
-Here I have added a Print function which is called with the Print statement above it.
+Here I have added a Print function which is called from the Print statement above it.
 
 Run the program and the see the output is unchanged.
 
@@ -350,7 +374,7 @@ microsoft.dotnet-httprepl      5.0.0        httprepl
 Create a single file self contained executable
 
 ```bash
-cd blogapp
+cd ConsoleApp
 dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 
 ```
@@ -361,15 +385,15 @@ The command will produce the following files relative to your project directory.
 
 ```bash
 #binary executable
-bin/Release/net5.0/osx-x64/publish/blogapp
+bin/Release/net5.0/osx-x64/publish/ConsoleApp
 #symbol file
-bin/Release/net5.0/osx-x64/publish/blogapp.pdb
+bin/Release/net5.0/osx-x64/publish/ConsoleApp.pdb
 ```
 
 Execute the program
 
 ```bash
-bin/Release/net5.0/osx-x64/publish/blogapp
+bin/Release/net5.0/osx-x64/publish/ConsoleApp
 ```
 
 You should see the app running
@@ -431,12 +455,12 @@ This command will print a verification code that you need to copy then paste in 
 Now that the client is authenticated, Create the local and remote repository:
 
 ```bash
-cd blogapp
+cd ConsoleApp
 #need to first initialize a local git repository before using the gh client 'repo create' command so the command can add the remote to the local repository
 git init
 # create a public repo (use --private instead to make the repo private)
 # the command will add the remote repo to our remotes so we wont need to add it manually like we normally need to do when using the git client
-gh repo create blogapp -d "A Blog" --public
+gh repo create ConsoleApp -d "A Blog" --public
 ```
 
 Now that the local and remote repos are created, we can make our first commit and push, creating a tracking branch in the process.
