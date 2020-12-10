@@ -380,9 +380,9 @@ You should see the app running
 
 I like to create a new Github repository anytime I create a new project so I can keep track of my changes from day one.
 
-I prefer the Github command line client to create my remote repository and then use standard Git command line client to create my local tracking repository.
+I prefer the Github command line client to create my remote repository and then using the standard Git command line client to create my local tracking repository.
 
-You can install Github command line tool using Homebrew.
+You can install Github command line tool using the Homebrew MacOS package manager:
 
 ```bash
 brew install gh
@@ -391,56 +391,69 @@ gh --version
 
 The manual for `gh` is located at [https://cli.github.com/manual](https://cli.github.com/manual)
 
-Macs come with a preinstalled version of the Git client. If you don't want to use your native MacOS git client you can install git using brew as well
+Macs come with a preinstalled version of the Git client. If you don't want to use your native MacOS git client you can install git using brew as well:
 
 ```bash
 brew install git
 git --version
 ```
 
-Configure the gh client and the remote repo to use the ssh protocol. By default they both use the http protocol.
+By default the `gh` client and the remote Github `git` repository to communicate using the http protocol.
+
+I like to configure the `gh` client and the Github repository to use the SSH protocol:
 
 ```bash
 #set local git client protocol
 gh config set git_protocol ssh
 #set remote git repo protocol
 gh config set -h github.com git_protocol ssh
-#check local setting
+#verify local setting
 gh config get git_protocol
-#check remote setting
+#verify remote setting
 gh config get -h github.com git_protocol
 ```
 
-Instructions for generating SSH keys and uploading them to Github.com is located at ???
+Instructions for generating a local SSH key pair and uploading the public key to Github.com is located at ???
 
-Before using the `gh` client we need to authenticate with the Github
+Now we are ready to use the `gh` client. But before using it we need to first authenticate with Github:
 
 ```bash
 #login to github using the web browser
 gh auth login -h github.com --web
 ```
 
-This command will print a verification code that you need to copy then paste in the browser window that it will launch to authenticate with Github.
+This command will print a verification code that you need to copy then paste in the browser window that the command launches to authenticate with Github.
 
-> Tip: After you copy the code put your cursor in the leftmost edit box on the web page and paste to paste in all entire code in one shot across all the edit boxes.
+> Tip: After you copy the code put your cursor in the leftmost edit box on the web page and paste to fill in the entire code in one shot across all the edit boxes in the web page.
 
 ### Create the remote repository on Github
 
-Now that the client is authenticated, Create the repository
+Now that the client is authenticated, Create the local and remote repository:
 
 ```bash
 cd blogapp
-#need to initialize a git repository before using the gh client 'repo create' command so the command can add the remote
+#need to first initialize a local git repository before using the gh client 'repo create' command so the command can add the remote to the local repository
 git init
 # create a public repo (use --private instead to make the repo private)
 # the command will add the remote repo to our remotes so we wont need to add it manually like we normally need to do when using the git client
 gh repo create blogapp -d "A Blog" --public
+```
+
+Now that the local and remote repos are created, we can make our first commit and push, creating a tracking branch in the process.
+
+```bash
 # track all files in the directory
 git add -A
 # the first commit
-git commit -am "first commit"
-# create a remote repo tracking branch and push changes to remote
+git commit -m "first commit"
+# push changes to remote
+# the -u flag creates a local tracking branch to our upstream remote branch
 git push -u origin master
+```
+
+Finally, we can navigate to our repo from the command line:
+
+```bash
 # inspect the new repository in the web browser
 gh repo view --web
 ```
