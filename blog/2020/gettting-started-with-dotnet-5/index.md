@@ -228,9 +228,9 @@ void Print(string outputText) =>
 
 Here I have added a Print function which is called from the Print statement above it.
 
-Run the program and the see the output is unchanged.
+Run the program and the see that the output is unchanged.
 
-You can also add top level classes to the file and then instantiate and call class methods in the top level statements.
+You can also add top level classes to the file and then instantiate the class and call class methods in the top level statements.
 
 How about adding command line arguments to our program to change the output text or print multiple text lines?
 
@@ -246,7 +246,9 @@ void Print(string outputText) =>
     Console.WriteLine(outputText);
 ```
 
-Now we can pass zero or more arguments to this program. Try these out
+Now we can pass zero or more arguments to this program.
+
+Try these out:
 
 ```bash
 #no arguments
@@ -257,7 +259,9 @@ dotnet run -- one
 dotnet run -- one two
 ```
 
-Finally lets also make this interactive to print more lines
+It should print each argument of a separate line then exit.
+
+Finally lets also make this interactive to print more lines:
 
 ```cs
 using System;
@@ -283,9 +287,13 @@ void Print(string outputText) =>
     Console.WriteLine(outputText);
 ```
 
-Run the code again.
+Run the code again:
 
-After it prints its output it waits for user input.
+```bash
+dotnet run
+```
+
+After it prints its output, it waits for user input.
 
 Typing any text and hitting the enter key, echos the text to the output.
 
@@ -299,29 +307,29 @@ Before you start the debugger, replace the `"console": "internalConsole"` settin
 
 This will allow the `Console.ReadLine()` line in the program to except input from the VSCode integrated terminal.
 
-Another option is to use the `"console": "externalTerminal"`, This will launch an external MacOS terminal when you start debugging, instead of using the integrated terminal.
+Another option is to use `"console": "externalTerminal"` setting instead of the `"console": "internalConsole"` setting. This will launch an external MacOS terminal when you start debugging, instead of using the integrated terminal.
 
 ## Installing Entity Framework 5
 
-One Other thing we may want to do is install is the Entity Framework command line tooling.
+One Other thing we may want to do is install the `Entity Framework` command line tooling.
 
-This will give us an opportunity to see how dotnet tools can be installed to add more command line capabilities.
+This will give us an opportunity to see how the `dotnet tools` command line extensions can be installed to add more command line capabilities.
 
-Install the EF Core tool
+Install the EF Core tool:
 
 ```bash
 dotnet tool install --global dotnet-ef --version 5.0.0
 ```
 
-In order to be able to access the tools we need to add the tools directory to our system path
+In order to be able to access the tools we need to add the tools directory to our system path.
 
-Add the following to your shell profile file
+Add the following to your shell profile file:
 
 ```bash
 export PATH="$PATH:~/.dotnet/tools"
 ```
 
-Check the EF Core version
+Verify the installed EF Core version:
 
 ```bash
 dotnet ef --version
@@ -334,27 +342,31 @@ Entity Framework Core .NET Command-line Tools
 5.0.0
 ```
 
-If you check `~/.dotnet/tools/` directory you should see the `dotnet-ef` binary file.
+If you check the `~/.dotnet/tools/` directory you should see the `dotnet-ef` binary file.
 
 To uninstall a global tool we can run the `dotnet tool uninstall` command with the same tool name.
 
+```bash
+dotnet tool uninstall ef
+```
+
 ## Installing other useful tools
 
-Other tools can be added using the same `dotnet tool install` command
+Other tools can be added using the same `dotnet tool install` command.
 
-Here is a tool that is a REPL for making HTTP calls to web apis
+Here is a tool that is a REPL for making HTTP calls to web APIs:
 
 ```bash
 dotnet tool install -g Microsoft.dotnet-httprepl
 ```
 
-You run this command directly without the `dotnet` command
+You run this command directly without prefixing it with the `dotnet` command:
 
 ```bash
 httprepl
 ```
 
-List all installed tools.
+We can also list all installed tools:
 
 ```bash
 dotnet tool list --global
@@ -371,12 +383,11 @@ microsoft.dotnet-httprepl      5.0.0        httprepl
 
 ## Building a self contained executable
 
-Create a single file self contained executable
+Create a single file self contained executable:
 
 ```bash
 cd ConsoleApp
 dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
-
 ```
 
 The -c flag specifies a Release version of the app and the -r flag specifies the target platform.
@@ -390,15 +401,15 @@ bin/Release/net5.0/osx-x64/publish/ConsoleApp
 bin/Release/net5.0/osx-x64/publish/ConsoleApp.pdb
 ```
 
-Execute the program
+We can execute the program directly:
 
 ```bash
 bin/Release/net5.0/osx-x64/publish/ConsoleApp
 ```
 
-You should see the app running
+You should see the app running.
 
-> Note we could have used `IncludeAllContentForSelfExtract` instead of `IncludeNativeLibrariesForSelfExtract` to make a the resulting executable extract files to disk as was done in .NET 3.1. However in .NET 5 we have the IncludeNativeLibrariesForSelfExtract option which will only extract some native libraries to the disk and load the rest of the program directly into memory.
+> Note we could have used `IncludeAllContentForSelfExtract` instead of `IncludeNativeLibrariesForSelfExtract` to make a the resulting executable extract files to disk as was done in .NET 3.1. However in .NET 5 we have the `IncludeNativeLibrariesForSelfExtract` option which will only extract some native libraries to the disk and load the rest of the program directly into memory. Consult the documentation as there are some issues with some of the single file executable options when your program uses reflection.
 
 ## One More Thing
 
