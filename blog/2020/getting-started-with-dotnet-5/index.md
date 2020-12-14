@@ -2,7 +2,9 @@
 
 December 14, 2020 by [Areg Sarkissian](https://aregcode.com/about)
 
-In this post I will show how to create a basic .NET 5 console application project using the `dotnet` command line interface and demonstrate a few new C# 9 features in the process.
+In this post I will show how to create a basic .NET 5 console application project using the `dotnet` command line interface and demonstrate a few new C# 9 features in the process. I will also show how to add the Entity Framework 5 tooling and how to run and debug your application. I will close out the post by showing how to create a single file executable from your project.
+
+As a bonus, I will show how you can use git and the Github cli to create local and remote Git repositories for your applications, all from the command line.
 
 ## .NET 5 installation on Mac
 
@@ -15,7 +17,7 @@ cd /usr/local/share/dotnet
 ./dotnet --version
 ```
 
-Should see the displayed .NET SDK version:
+We should see the displayed .NET SDK version:
 5.0.100
 
 Create a symlink to the `dotnet` executable in the binaries directory that is on the system path:
@@ -30,13 +32,13 @@ Verify the `dotnet` command is available globally:
 dotnet --version
 ```
 
-Should see the displayed the SDK version:
+We should see the displayed the SDK version:
 
 5.0.100
 
 ## Creating a .NET project
 
-Create the project directory and add a `global.json` file to specify the SDK version:
+Create the project directory and add a `global.json` file to specify the .NET SDK version:
 
 ```bash
 mkdir ConsoleApp && cd ConsoleApp
@@ -44,7 +46,7 @@ dotnet new globaljson --sdk-version 5.0.100
 cat global.json
 ```
 
-You should see a new global.json file generated withe the following content:
+We should see a new global.json file generated with the following content:
 
 ```json
 {
@@ -65,9 +67,9 @@ Open the file and add the `rollForward` strategy for rolling forward with future
 }
 ```
 
-I chose the strategy to roll forward only with minor versions.
+I chose the strategy, to roll forward only with minor versions.
 
-> See details for the different rollForward strategies at https://docs.microsoft.com/en-us/dotnet/core/tools/global-json
+> See details for the different rollForward strategies at [https://docs.microsoft.com/en-us/dotnet/core/tools/global-json](https://docs.microsoft.com/en-us/dotnet/core/tools/global-json)
 
 Verify the project SDK version again:
 
@@ -75,7 +77,7 @@ Verify the project SDK version again:
 dotnet --version
 ```
 
-Should still display the SDK version unless you have upgraded to a newer minor version of the SDK.
+It should still display the SDK version unless you have upgraded to a newer minor version of the SDK.
 
 5.0.100
 
@@ -110,11 +112,11 @@ We can see the .NET 5 framework is the target:
 
 Open the project in VSCode:
 
+> I have configured the my VSCode executable to launch from the command line
+
 ```bash
 code .
 ```
-
-> I have configured the my VSCode executable to launch from the command line
 
 The first time we open a .NET project in VSCode, it will automatically start downloading and installing the editor extension packages it needs for IntelliSense, building and debugging .NET applications.
 
@@ -160,7 +162,7 @@ We can run the code as is by using the following command:
 dotnet run
 ```
 
-> the `dotnet run` command will run the `dotnet build` command which will in turn run the `dotnet restore` command, so there is no need to run each command individually.
+> The `dotnet run` command will run the `dotnet build` command which will in turn run the `dotnet restore` command, so there is no need to run each command individually.
 
 The response should be:
 
@@ -222,7 +224,7 @@ void Print(string outputText) =>
     Console.WriteLine(outputText);
 ```
 
-Here I have added a Print function which is called from the Print statement above it.
+Here I have added a `Print` function which is called from the `Print` statement above it.
 
 Run the program and the see that the output is unchanged.
 
