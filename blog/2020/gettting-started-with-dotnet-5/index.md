@@ -1,10 +1,6 @@
 # Create a .NET 5 Console App
 
-December 10
-
-[Create a .NET 5 Console App](https://aregcode.com/blog/2020/create-a-dotnet-5-console-app)
-
-December 10, 2020
+December 14, 2019 by [Areg Sarkissian](https://aregcode.com/about)
 
 In this post I will show how to create a basic .NET 5 console application project using the `dotnet` command line interface and demonstrate a few new C# 9 features in the process.
 
@@ -433,7 +429,7 @@ brew install gh
 gh --version
 ```
 
-The manual for `gh` is located at [https://cli.github.com/manual](https://cli.github.com/manual)
+The manual for the `gh` cli is located at [Github cli manual](https://cli.github.com/manual).
 
 Macs come with a preinstalled version of the Git client. If you don't want to use your native MacOS git client you can install git using brew as well:
 
@@ -526,10 +522,10 @@ And with that we are done!
 
 ## Resources
 
-https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh
+[connecting-to-github-with-ssh](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh)
 
-https://www.freecodecamp.org/news/the-ultimate-guide-to-ssh-setting-up-ssh-keys/
+[the-ultimate-guide-to-ssh-setting-up-ssh-keys](https://www.freecodecamp.org/news/the-ultimate-guide-to-ssh-setting-up-ssh-keys)
 
-https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys
+[ssh-essentials-working-with-ssh-servers-clients-and-keys](https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys)
 
-[https://cli.github.com/manual](https://cli.github.com/manual)
+[Github cli manual](https://cli.github.com/manual)
