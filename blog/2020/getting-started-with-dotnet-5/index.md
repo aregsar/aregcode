@@ -522,10 +522,10 @@ And with that we are done!
 
 ## Resources
 
-[connecting-to-github-with-ssh](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh)
+[Github cli manual](https://cli.github.com/manual)
 
-[the-ultimate-guide-to-ssh-setting-up-ssh-keys](https://www.freecodecamp.org/news/the-ultimate-guide-to-ssh-setting-up-ssh-keys)
+[connecting-to-github-with-ssh](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh)
 
 [ssh-essentials-working-with-ssh-servers-clients-and-keys](https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys)
 
-[Github cli manual](https://cli.github.com/manual)
+[the-ultimate-guide-to-ssh-setting-up-ssh-keys](https://www.freecodecamp.org/news/the-ultimate-guide-to-ssh-setting-up-ssh-keys)
