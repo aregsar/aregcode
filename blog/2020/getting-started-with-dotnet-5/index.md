@@ -1,4 +1,4 @@
-# Create a .NET 5 Console App
+# Getting Started With .NET 5
 
 December 14, 2019 by [Areg Sarkissian](https://aregcode.com/about)
 
