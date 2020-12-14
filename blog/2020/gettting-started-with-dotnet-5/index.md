@@ -87,7 +87,7 @@ Create a .NET `.gitignore` file:
 
 ```bash
 dotnet new gitignore
-cat gitignore
+cat .gitignore
 ```
 
 Create the console app and print out the created project file:
@@ -307,7 +307,9 @@ Before you start the debugger, replace the `"console": "internalConsole"` settin
 
 This will allow the `Console.ReadLine()` line in the program to except input from the VSCode integrated terminal.
 
-Another option is to use `"console": "externalTerminal"` setting instead of the `"console": "internalConsole"` setting. This will launch an external MacOS terminal when you start debugging, instead of using the integrated terminal.
+> Make sure you open the VSCode terminal tab to see the output of the program and type input. By default when you run the debugger the debug tab is in focus showing the debug output of the program.
+
+Another option is to use `"console": "externalTerminal"` setting instead of the `"console": "internalConsole"` setting. This will launch an external MacOS terminal when you start debugging, instead of using the integrated terminal, just as when you ran the program in the terminal before.
 
 ## Installing Entity Framework 5
 
@@ -344,6 +346,12 @@ Entity Framework Core .NET Command-line Tools
 
 If you check the `~/.dotnet/tools/` directory you should see the `dotnet-ef` binary file.
 
+To see the available commands run:
+
+```bash
+dotnet ef --help
+```
+
 To uninstall a global tool we can run the `dotnet tool uninstall` command with the same tool name.
 
 ```bash
@@ -366,6 +374,8 @@ You run this command directly without prefixing it with the `dotnet` command:
 httprepl
 ```
 
+> You can use Ctrl-c to exit the tool
+
 We can also list all installed tools:
 
 ```bash
@@ -383,10 +393,9 @@ microsoft.dotnet-httprepl      5.0.0        httprepl
 
 ## Building a self contained executable
 
-Create a single file self contained executable:
+Create a single file self contained executable, from the project directory run the `dotnet publish` command:
 
 ```bash
-cd ConsoleApp
 dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 ```
 
@@ -401,7 +410,7 @@ bin/Release/net5.0/osx-x64/publish/ConsoleApp
 bin/Release/net5.0/osx-x64/publish/ConsoleApp.pdb
 ```
 
-We can execute the program directly:
+We can run the program directly from the project directory by executing:
 
 ```bash
 bin/Release/net5.0/osx-x64/publish/ConsoleApp
@@ -448,9 +457,11 @@ gh config get git_protocol
 gh config get -h github.com git_protocol
 ```
 
-Instructions for generating a local SSH key pair and uploading the public key to Github.com is located at ???
+As configured above the `gh config get` commands should return `ssh`. You can run them anytime to change or check the git protocol setting.
 
 Now we are ready to use the `gh` client. But before using it we need to first authenticate with Github:
+
+> Note: In order to be able to use the SSH protocol with Github, we have to generate and upload SSH keys to Github. Instructions for generating a local SSH key pair and uploading the public key to Github.com can be found in the resources section at the end of this post.
 
 ```bash
 #login to github using the web browser
@@ -463,15 +474,24 @@ This command will print a verification code that you need to copy then paste in 
 
 ### Create the remote repository on Github
 
-Now that the client is authenticated, Create the local and remote repository:
+Now that the client is authenticated, Create the local and remote repository from within the project directory:
 
 ```bash
-cd ConsoleApp
 #need to first initialize a local git repository before using the gh client 'repo create' command so the command can add the remote to the local repository
 git init
 # create a public repo (use --private instead to make the repo private)
 # the command will add the remote repo to our remotes so we wont need to add it manually like we normally need to do when using the git client
-gh repo create ConsoleApp -d "A Blog" --public
+gh repo create ConsoleApp -d "First .NET 5 App" --public
+```
+
+The command will ask to create the repo named ConsoleApp in the current directory.
+
+Type `y` and hit enter to continue to create the remote repo and add it as a remote to your local git repo, showing the output below:
+
+```bash
+? This will create 'ConsoleApp' in your current directory. Continue?  Yes
+✓ Created repository aregsar/ConsoleApp on GitHub
+✓ Added remote git@github.com:aregsar/ConsoleApp.git
 ```
 
 Now that the local and remote repos are created, we can make our first commit and push, creating a tracking branch in the process.
@@ -484,6 +504,7 @@ git commit -m "first commit"
 # push changes to remote
 # the -u flag creates a local tracking branch to our upstream remote branch
 git push -u origin master
+git status
 ```
 
 Finally, we can navigate to our repo from the command line:
@@ -493,4 +514,22 @@ Finally, we can navigate to our repo from the command line:
 gh repo view --web
 ```
 
+When you are done creating the repository, you can logout:
+
+```bash
+gh auth logout
+```
+
+You can still use the standard `git` commands to commit and push changes after logging out with `gh`.
+
 And with that we are done!
+
+## Resources
+
+https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh
+
+https://www.freecodecamp.org/news/the-ultimate-guide-to-ssh-setting-up-ssh-keys/
+
+https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys
+
+[https://cli.github.com/manual](https://cli.github.com/manual)
