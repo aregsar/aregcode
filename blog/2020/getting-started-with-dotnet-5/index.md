@@ -1,6 +1,6 @@
 # Getting Started With .NET 5
 
-December 14, 2019 by [Areg Sarkissian](https://aregcode.com/about)
+December 14, 2020 by [Areg Sarkissian](https://aregcode.com/about)
 
 In this post I will show how to create a basic .NET 5 console application project using the `dotnet` command line interface and demonstrate a few new C# 9 features in the process.
 
