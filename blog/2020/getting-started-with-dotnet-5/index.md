@@ -2,15 +2,19 @@
 
 December 14, 2020 by [Areg Sarkissian](https://aregcode.com/about)
 
-In this post I will show how to create a basic .NET 5 console application project using the `dotnet` command line interface and demonstrate a few new C# 9 features in the process. I will also show how to add the Entity Framework 5 tooling and how to run and debug your application. I will close out the post by showing how to create a single file executable from your project.
+In this post I will show how to create a basic .NET 5 console application project using the `dotnet` command line interface and demonstrate a few new C# 9 features in the process.
 
-As a bonus, I will show how you can use git and the Github cli to create local and remote Git repositories for your applications, all from the command line.
+I will also show how to add the Entity Framework 5 tooling and how to run and debug your application. I will close out the post by showing how to create a single file executable from your project.
 
-## .NET 5 installation on Mac
+As a bonus, I will also show how you can use git and the Github cli to create local and remote Git repositories for your project, all from the command line.
+
+Most of the content here applies to Windows installations as well, however since I use a Mac for development, the instructions will be based on using the Mac terminal and the command line.
+
+## .NET 5 installation on MacOS
 
 Download and install .NET 5 SDK from [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
 
-Check the version of the `dotnet` executable in installation directory:
+After downloading and running the SDK installer, we can verify the version of the `dotnet` executable that was placed in the `/usr/local/share/dotnet` directory:
 
 ```bash
 cd /usr/local/share/dotnet
@@ -20,15 +24,16 @@ cd /usr/local/share/dotnet
 We should see the displayed .NET SDK version:
 5.0.100
 
-Create a symlink to the `dotnet` executable in the binaries directory that is on the system path:
+To be able to run the `dotnet` command globally we need to create a symlink to it in the `/usr/local/bin/` binaries directory that is on the system path:
 
 ```bash
 ln -s /usr/local/share/dotnet/dotnet /usr/local/bin/
 ```
 
-Verify the `dotnet` command is available globally:
+Go to your home directory and verify that the `dotnet` command is available globally:
 
 ```bash
+cd ~
 dotnet --version
 ```
 
@@ -38,7 +43,9 @@ We should see the displayed the SDK version:
 
 ## Creating a .NET project
 
-Create the project directory and add a `global.json` file to specify the .NET SDK version:
+Within a .NET project, the SDK version that the `dotnet` command uses can be specified by a `global.json` file.
+
+So before we use the `dotnet` command to create a new project, we want to create the project directory and add a `global.json` file to specify the .NET SDK version:
 
 ```bash
 mkdir ConsoleApp && cd ConsoleApp
@@ -71,7 +78,7 @@ I chose the strategy, to roll forward only with minor versions.
 
 > See details for the different rollForward strategies at [https://docs.microsoft.com/en-us/dotnet/core/tools/global-json](https://docs.microsoft.com/en-us/dotnet/core/tools/global-json)
 
-Verify the project SDK version again:
+Save the file and verify the project SDK version again:
 
 ```bash
 dotnet --version
@@ -81,21 +88,21 @@ It should still display the SDK version unless you have upgraded to a newer mino
 
 5.0.100
 
-Create a .NET `.gitignore` file:
+Before creating the project we can also create a .NET `.gitignore` file:
 
 ```bash
 dotnet new gitignore
 cat .gitignore
 ```
 
-Create the console app and print out the created project file:
+Now create the console app and print out the created project file:
 
 ```bash
 dotnet new console
 cat ConsoleApp.csproj
 ```
 
-We can see the .NET 5 framework is the target:
+We can see the .NET 5 framework is specified as the target framework:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -112,13 +119,14 @@ We can see the .NET 5 framework is the target:
 
 Open the project in VSCode:
 
-> I have configured the my VSCode executable to launch from the command line
-
 ```bash
+# open the current directoy in the VSCode editor
 code .
 ```
 
-The first time we open a .NET project in VSCode, it will automatically start downloading and installing the editor extension packages it needs for IntelliSense, building and debugging .NET applications.
+> Note: I have configured my VSCode installation to launch the editor from the command line using the `code` command. VSCode is a free editor from Microsoft for cross platform development.
+
+The first time we open a .NET project in VSCode, it will automatically start downloading and installing the editor extension packages it needs for IntelliSense and building and debugging .NET applications.
 
 ```bash
 Installing C# dependencies...
@@ -198,8 +206,6 @@ using System;
 
 Console.WriteLine("Hello World!");
 ```
-
-Here I have removed all the boilerplate code.
 
 Run the program again
 
