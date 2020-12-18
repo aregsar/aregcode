@@ -315,7 +315,7 @@ Another option is to use `"console": "externalTerminal"` setting instead of the 
 
 ## Installing Entity Framework 5
 
-One Other thing we may want to do is install the `Entity Framework` command line tooling.
+One other thing we may want to do is install the `Entity Framework` command line tooling.
 
 This will give us an opportunity to see how the `dotnet tools` command line extensions can be installed to add more command line capabilities.
 
