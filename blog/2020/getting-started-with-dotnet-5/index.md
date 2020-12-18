@@ -30,7 +30,7 @@ To be able to run the `dotnet` command globally we need to create a symlink to i
 ln -s /usr/local/share/dotnet/dotnet /usr/local/bin/
 ```
 
-Go to your home directory and verify that the `dotnet` command is available globally:
+Now go to your home directory and verify that the `dotnet` command is available globally:
 
 ```bash
 cd ~
@@ -160,7 +160,7 @@ Clicking the `yes` button will add the `.vscode` directory which contains the `l
 
 The `.vscode` directory will also contain the `tasks.json` tasks settings file for running build tasks from VSCode GUI.
 
-> You can find the code for the OmniSharp at [https://github.com/OmniSharp/omnisharp-vscode](https://github.com/OmniSharp/omnisharp-vscode)
+> You can find the code for the OmniSharp extension at [https://github.com/OmniSharp/omnisharp-vscode](https://github.com/OmniSharp/omnisharp-vscode)
 
 ## Running the program from the command line
 
@@ -250,22 +250,20 @@ void Print(string outputText) =>
     Console.WriteLine(outputText);
 ```
 
-Now we can pass zero or more arguments to this program.
+As you can see now the code loops through and prints any arguments that are passed to the program from the command line.
 
-Try these out:
+Try it out:
 
 ```bash
-#no arguments
+# run without arguments
 dotnet run
-#one argument
+# run with one argument
 dotnet run -- one
-#two arguments
+# run with two arguments
 dotnet run -- one two
 ```
 
-It should print each argument of a separate line then exit.
-
-Finally lets also make this interactive to print more lines:
+Finally lets add code to interactively read and echo text input lines:
 
 ```cs
 using System;
@@ -307,11 +305,11 @@ Hitting enter key alone will exit the program.
 
 To run this program using the VSCode debugger, use the `cmd+shift+d` keyboard shortcut to open the debugger panel and start the debugger.
 
-Before you start the debugger, replace the `"console": "internalConsole"` setting in the `"name": ".NET Core Launch (console)"` configuration section in the `.vscode/launch.json` file to `"console": "integratedTerminal"`.
+Before you start the debugger, replace the `"console": "internalConsole"` setting in the `"name": ".NET Core Launch (console)"` configuration section of the `.vscode/launch.json` file to `"console": "integratedTerminal"`.
 
 This will allow the `Console.ReadLine()` line in the program to except input from the VSCode integrated terminal.
 
-> Make sure you open the VSCode terminal tab to see the output of the program and type input. By default when you run the debugger the debug tab is in focus showing the debug output of the program.
+> Make sure that you have opened the VSCode terminal tab to interact with the program. By default when you run the debugger the debug tab is in focus showing the debug output of the program.
 
 Another option is to use `"console": "externalTerminal"` setting instead of the `"console": "internalConsole"` setting. This will launch an external MacOS terminal when you start debugging, instead of using the integrated terminal, just as when you ran the program in the terminal before.
 
@@ -350,7 +348,7 @@ Entity Framework Core .NET Command-line Tools
 
 If you check the `~/.dotnet/tools/` directory you should see the `dotnet-ef` binary file.
 
-To see the available commands run:
+To see the available entity framework commands, use the help flag with the command:
 
 ```bash
 dotnet ef --help
@@ -397,7 +395,7 @@ microsoft.dotnet-httprepl      5.0.0        httprepl
 
 ## Building a self contained executable
 
-Create a single file self contained executable, from the project directory run the `dotnet publish` command:
+To create a single file self contained executable from our project, run the `dotnet publish` command from the project directory:
 
 ```bash
 dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
@@ -430,7 +428,7 @@ I like to create a new Github repository anytime I create a new project so I can
 
 I prefer the Github command line client to create my remote repository and then using the standard Git command line client to create my local tracking repository.
 
-You can install Github command line tool using the Homebrew MacOS package manager:
+You can install the Github command line tool using the Homebrew MacOS package manager:
 
 ```bash
 brew install gh
@@ -439,14 +437,14 @@ gh --version
 
 The manual for the `gh` cli is located at [Github cli manual](https://cli.github.com/manual).
 
-Macs come with a preinstalled version of the Git client. If you don't want to use your native MacOS git client you can install git using brew as well:
+Macs come with a preinstalled version of the Git client as part of the XCode development tools. If you don't want to use your native MacOS git client you can install git using brew as well:
 
 ```bash
 brew install git
 git --version
 ```
 
-By default the `gh` client and the remote Github `git` repository to communicate using the http protocol.
+By default the `gh` client and the remote Github `git` repository are configured to communicate using the HTTP protocol.
 
 I like to configure the `gh` client and the Github repository to use the SSH protocol:
 
@@ -461,7 +459,7 @@ gh config get git_protocol
 gh config get -h github.com git_protocol
 ```
 
-As configured above the `gh config get` commands should return `ssh`. You can run them anytime to change or check the git protocol setting.
+As configured above, the `gh config get` commands should respond with `ssh`. You can run the commands anytime to change or check the git protocol setting.
 
 Now we are ready to use the `gh` client. But before using it we need to first authenticate with Github:
 
@@ -490,7 +488,9 @@ gh repo create ConsoleApp -d "First .NET 5 App" --public
 
 The command will ask to create the repo named ConsoleApp in the current directory.
 
-Type `y` and hit enter to continue to create the remote repo and add it as a remote to your local git repo, showing the output below:
+Type `y` and hit enter to continue to create the remote repo.
+
+After the remote repo is created, it is added to the list of remotes for your local repo, as seen in the output below:
 
 ```bash
 ? This will create 'ConsoleApp' in your current directory. Continue?  Yes
