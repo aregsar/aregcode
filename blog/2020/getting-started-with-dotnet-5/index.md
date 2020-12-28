@@ -537,3 +537,7 @@ And with that we are done!
 [ssh-essentials-working-with-ssh-servers-clients-and-keys](https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys)
 
 [the-ultimate-guide-to-ssh-setting-up-ssh-keys](https://www.freecodecamp.org/news/the-ultimate-guide-to-ssh-setting-up-ssh-keys)
+
+[how-to-set-up-ssh-keys](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-2)
+
+[how-to-use-ssh-to-connect-to-a-remote-server](https://www.digitalocean.com/community/tutorials/how-to-use-ssh-to-connect-to-a-remote-server)
